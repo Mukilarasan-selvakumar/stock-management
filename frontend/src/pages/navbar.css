@@ -1,0 +1,103 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #2196f3;
+  padding: 12px 40px;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* LOGO */
+.logo {
+  font-size: 22px;
+  font-weight: 600;
+  color: white;
+}
+
+/* RIGHT SIDE */
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 40px; /* 🔥 more spacing */
+}
+
+/* NAV */
+.nav-links {
+  display: flex;
+  gap: 25px;
+}
+
+.nav-links a {
+  color: rgba(255,255,255,0.9);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  position: relative;
+  padding-bottom: 5px;
+  transition: 0.3s;
+}
+
+/* 🔥 HOVER EFFECT */
+.nav-links a:hover {
+  color: white;
+}
+
+/* 🔥 ACTIVE UNDERLINE (modern look) */
+.nav-links .active {
+  color: white;
+}
+
+.nav-links .active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: white;
+  border-radius: 2px;
+}
+
+/* USER SECTION */
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-left: 1px solid rgba(255,255,255,0.3);
+  padding-left: 20px;
+}
+
+/* AVATAR */
+.userAvatar {
+  width: 34px;
+  height: 34px;
+  background: white;
+  color: #2196f3;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* USER NAME */
+.user-section span {
+  font-size: 14px;
+}
+
+/* LOGOUT BUTTON */
+.logout-btn {
+  padding: 6px 12px;
+  border: none;
+  background: white;
+  color: #2196f3;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.logout-btn:hover {
+  background: #e3f2fd;
+}
