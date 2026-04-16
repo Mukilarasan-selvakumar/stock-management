@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ConfigProvider } from 'antd';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -7,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Users from './pages/users';
 import StockPage from './pages/StockPage';
 import Billing from './pages/Billing';
+import Analytics from './pages/Analytics';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useContext(AuthContext);
@@ -81,6 +83,14 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+<Route
+        path="/analytics"
+        element={
+          <ProtectedRoute>
+            <Analytics/>
+          </ProtectedRoute>
+        }
+      />
 
     </Routes>
   );
@@ -88,11 +98,31 @@ function AppRoutes() {
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </Router>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#0ea5e9',
+          borderRadius: 12,
+          fontFamily: 'Outfit, sans-serif',
+          colorBgContainer: '#ffffff',
+          colorBgLayout: '#f8fafc',
+        },
+        components: {
+          Card: {
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+          },
+          Button: {
+            fontWeight: 500,
+          }
+        }
+      }}
+    >
+      <Router>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </Router>
+    </ConfigProvider>
   );
 }
 

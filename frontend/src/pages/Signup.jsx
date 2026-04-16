@@ -1,63 +1,114 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import './auth.css';
+import { Form, Input, Button, Card, Typography, Alert, Row, Col } from 'antd';
+import { MailOutlined, LockOutlined, UserOutlined, PhoneOutlined, RocketOutlined } from '@ant-design/icons';
+
+const { Title, Text } = Typography;
 
 const Signup = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    password: ''
-  });
-
   const { signup } = useContext(AuthContext);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onFinish = async (values) => {
+    setLoading(true);
+    setError(null);
     try {
-      await signup(formData);
+      await signup(values);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to signup');
+      setError(err.response?.data?.message || 'Failed to create account. Email might already exist.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="auth-wrapper">
+    <div style={{ 
+      background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)", 
+      minHeight: "100vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "20px"
+    }}>
+      <Row gutter={40} align="middle" style={{ maxWidth: 1000, width: "100%" }}>
+        
+        {/* Decorative Side */}
+        <Col xs={0} md={12}>
+          <div style={{ color: "#1e293b" }}>
+            <RocketOutlined style={{ fontSize: 60, color: "#0ea5e9", marginBottom: 20 }} />
+            <Title level={1} style={{ fontSize: 48, fontWeight: 800, margin: 0, color: "#1e293b" }}>
+              Join <span style={{ color: "#0ea5e9" }}>Edge</span>
+            </Title>
+            <Title level={3} style={{ marginTop: 0, fontWeight: 500, color: "#64748b" }}>
+              Professional Inventory Management
+            </Title>
+            <p style={{ fontSize: 18, color: "#64748b", maxWidth: 400 }}>
+              Unlock the power of predictive analytics and automated stocking. Scale your business with data.
+            </p>
+          </div>
+        </Col>
 
-      {/* LEFT */}
-      <div className="left-panel">
-        <h1>Store Management Application</h1>
-        <p>Create account and start managing your store</p>
-      </div>
+        {/* Signup Form */}
+        <Col xs={24} md={12}>
+          <Card 
+            style={{ 
+              borderRadius: 24, 
+              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+              padding: "20px" 
+            }}
+          >
+            <div style={{ marginBottom: 30 }}>
+              <Title level={2} style={{ margin: 0 }}>Create Account</Title>
+              <Text type="secondary">Join thousands of optimized stores today</Text>
+            </div>
 
-      {/* RIGHT */}
-      <div className="right-panel">
-        <h2>Signup</h2>
+            {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 20, borderRadius: 12 }} />}
 
-        {error && <p className="error">{error}</p>}
+            <Form layout="vertical" onFinish={onFinish} size="large">
+              <Form.Item 
+                name="name" 
+                rules={[{ required: true, message: 'Please enter your full name' }]}
+              >
+                <Input prefix={<UserOutlined style={{ color: "#94a3b8" }} />} placeholder="Full Name" style={{ borderRadius: 12 }} />
+              </Form.Item>
 
-        <form onSubmit={handleSubmit}>
-          <input name="name" placeholder="Full Name" onChange={handleChange} required />
-          <input name="email" placeholder="Email" onChange={handleChange} required />
-          <input name="phone" placeholder="Phone" onChange={handleChange} required />
-          <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
+              <Form.Item 
+                name="email" 
+                rules={[{ required: true, type: 'email', message: 'Please enter a valid email' }]}
+              >
+                <Input prefix={<MailOutlined style={{ color: "#94a3b8" }} />} placeholder="Email Address" style={{ borderRadius: 12 }} />
+              </Form.Item>
 
-          <button type="submit" style={{
-    display: "block",
-    margin: "10px auto"
-  }}>Signup</button>
-        </form>
-<p style={{ textAlign: "center", marginTop: "10px" }}>
-  Already have an account? <Link to="/login">Login</Link>
-</p>
-       
-      </div>
+              <Form.Item 
+                name="phone" 
+                rules={[{ required: true, message: 'Please enter your phone number' }]}
+              >
+                <Input prefix={<PhoneOutlined style={{ color: "#94a3b8" }} />} placeholder="Phone Number" style={{ borderRadius: 12 }} />
+              </Form.Item>
+
+              <Form.Item 
+                name="password" 
+                rules={[{ required: true, min: 6, message: 'Password must be at least 6 characters' }]}
+              >
+                <Input.Password prefix={<LockOutlined style={{ color: "#94a3b8" }} />} placeholder="Password" style={{ borderRadius: 12 }} />
+              </Form.Item>
+
+              <Form.Item>
+                <Button type="primary" htmlType="submit" loading={loading} block style={{ height: 50, borderRadius: 12, fontWeight: 600, fontSize: 16 }}>
+                  Get Started
+                </Button>
+              </Form.Item>
+            </Form>
+
+            <div style={{ textAlign: "center", marginTop: 20 }}>
+              <Text type="secondary">Already have an account? </Text>
+              <Link to="/login" style={{ fontWeight: 600, color: "#0ea5e9" }}>Sign In</Link>
+            </div>
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };

@@ -79,15 +79,20 @@ const columns = [
   return (
     <>
       <Navbar />
-      <div style={{ padding: 20 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 15 }}>
-          <h2>StockPage Management</h2>
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-            Add StockPage
+      <div style={{ padding: 40, background: "#f8fafc", minHeight: "calc(100vh - 70px)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 25 }}>
+          <h2 style={{ margin: 0, fontWeight: 700, color: "#1e293b" }}>Inventory Management</h2>
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd} size="large" style={{ borderRadius: 10 }}>
+            Add New Product
           </Button>
         </div>
 
-        <Table dataSource={data} columns={columns} rowKey="_id" />
+        <Table 
+          dataSource={data} 
+          columns={columns} 
+          rowKey="_id" 
+          style={{ background: "#fff", borderRadius: 12, overflow: "hidden", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }} 
+        />
 
         <Modal
           title={editItem ? "Edit StockPage" : "Add StockPage"}

@@ -2,24 +2,28 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #2196f3;
-  padding: 12px 40px;
-  color: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background: #ffffff;
+  padding: 16px 40px;
+  color: #1e293b;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 /* LOGO */
 .logo {
   font-size: 22px;
-  font-weight: 600;
-  color: white;
+  font-weight: 700;
+  color: #0ea5e9;
+  letter-spacing: -0.5px;
 }
 
 /* RIGHT SIDE */
 .right-section {
   display: flex;
   align-items: center;
-  gap: 40px; /* 🔥 more spacing */
+  gap: 40px;
 }
 
 /* NAV */
@@ -29,34 +33,26 @@
 }
 
 .nav-links a {
-  color: rgba(255,255,255,0.9);
+  color: #64748b;
   text-decoration: none;
   font-size: 15px;
   font-weight: 500;
   position: relative;
-  padding-bottom: 5px;
-  transition: 0.3s;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 /* 🔥 HOVER EFFECT */
 .nav-links a:hover {
-  color: white;
+  background: #f0f9ff;
+  color: #0ea5e9;
 }
 
-/* 🔥 ACTIVE UNDERLINE (modern look) */
+/* 🔥 ACTIVE STATE */
 .nav-links .active {
-  color: white;
-}
-
-.nav-links .active::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 2px;
-  background: white;
-  border-radius: 2px;
+  color: #0ea5e9;
+  background: #e0f2fe;
 }
 
 /* USER SECTION */
@@ -64,40 +60,45 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  border-left: 1px solid rgba(255,255,255,0.3);
+  border-left: 1px solid #e2e8f0;
   padding-left: 20px;
 }
 
 /* AVATAR */
 .userAvatar {
-  width: 34px;
-  height: 34px;
-  background: white;
-  color: #2196f3;
+  width: 36px;
+  height: 36px;
+  background: #0ea5e9;
+  color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(14, 165, 233, 0.2);
 }
 
 /* USER NAME */
 .user-section span {
   font-size: 14px;
+  font-weight: 500;
+  color: #334155;
 }
 
 /* LOGOUT BUTTON */
 .logout-btn {
-  padding: 6px 12px;
-  border: none;
+  padding: 8px 16px;
+  border: 1px solid #e2e8f0;
   background: white;
-  color: #2196f3;
-  border-radius: 6px;
+  color: #64748b;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
-  transition: 0.3s;
+  transition: all 0.3s ease;
 }
 
 .logout-btn:hover {
-  background: #e3f2fd;
+  border-color: #ef4444;
+  color: #ef4444;
+  background: #fef2f2;
 }

@@ -146,57 +146,80 @@ const debouncedFetchProduct = useMemo(() => {
     <>
       <Navbar />
 
-      <div style={{ padding: 20, maxWidth: 900, margin: "auto" }}>
-        <h2>Billing Page</h2>
+      <div style={{ padding: 40, background: "#f8fafc", minHeight: "calc(100vh - 70px)" }}>
+        <div style={{ maxWidth: 1000, margin: "auto" }}>
+          
+          <div style={{ marginBottom: 25 }}>
+            <h2 style={{ fontWeight: 700, color: "#1e293b" }}>Billing & Invoicing</h2>
+            <p style={{ color: "#64748b" }}>Create a new sales transaction for a customer.</p>
+          </div>
 
-        {/* 👤 CUSTOMER FORM */}
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="customerName"
-            label="Customer Name"
-            rules={[{ required: true }]}
-          >
-            <Input placeholder="Enter name" />
-          </Form.Item>
+          <div style={{ background: "#fff", padding: 30, borderRadius: 16, boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
+            
+            {/* 👤 CUSTOMER FORM */}
+            <Form form={form} layout="vertical">
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "20px" }}>
+                <Form.Item
+                  name="customerName"
+                  label={<b>Customer Name</b>}
+                  rules={[{ required: true }]}
+                >
+                  <Input placeholder="Enter name" style={{ borderRadius: 8 }} />
+                </Form.Item>
 
-          <Form.Item name="phone" label="Phone">
-            <Input placeholder="Enter phone" />
-          </Form.Item>
+                <Form.Item name="phone" label={<b>Phone</b>}>
+                  <Input placeholder="Enter phone" style={{ borderRadius: 8 }} />
+                </Form.Item>
 
-          <Form.Item name="email" label="Email">
-            <Input placeholder="Enter email" />
-          </Form.Item>
-        </Form>
+                <Form.Item name="email" label={<b>Email</b>}>
+                  <Input placeholder="Enter email" style={{ borderRadius: 8 }} />
+                </Form.Item>
+              </div>
+            </Form>
 
-        {/* ➕ ADD ITEM */}
-        <Button
-          type="dashed"
-          icon={<PlusOutlined />}
-          onClick={addItem}
-          style={{ marginBottom: 10 }}
-        >
-          Add Product
-        </Button>
+            <div style={{ margin: "20px 0", borderTop: "1px solid #f1f5f9" }} />
 
-        {/* 📊 TABLE */}
-        <Table
-          dataSource={items}
-          columns={columns}
-          pagination={false}
-          rowKey={(record, index) => index}
-        />
+            {/* 📊 TABLE SECTION */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 15 }}>
+              <h3 style={{ margin: 0, color: "#1e293b" }}>Product Items</h3>
+              <Button
+                type="dashed"
+                icon={<PlusOutlined />}
+                onClick={addItem}
+                style={{ borderRadius: 8, color: "#0ea5e9", borderColor: "#0ea5e9" }}
+              >
+                Add Product
+              </Button>
+            </div>
 
-        {/* 💰 TOTAL */}
-        <div style={{ marginTop: 20, textAlign: "right" }}>
-          <h3>Total: ₹ {totalAmount}</h3>
+            <Table
+              dataSource={items}
+              columns={columns}
+              pagination={false}
+              rowKey={(record, index) => index}
+              style={{ marginBottom: 20 }}
+            />
+
+            {/* 💰 SUMMARY & SUBMIT */}
+            <div style={{ 
+              background: "#f0f9ff", 
+              padding: 20, 
+              borderRadius: 12, 
+              display: "flex", 
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}>
+              <div>
+                <span style={{ color: "#64748b" }}>Grand Total:</span>
+                <span style={{ fontSize: "24px", fontWeight: 700, color: "#0ea5e9", marginLeft: 15 }}>₹ {totalAmount}</span>
+              </div>
+              <Button type="primary" size="large" onClick={handleSubmit} style={{ borderRadius: 10, padding: "0 40px" }}>
+                Complete Transaction
+              </Button>
+            </div>
+
+          </div>
         </div>
-
-        {/* 🚀 SUBMIT */}
-        <Space style={{ marginTop: 20 }}>
-          <Button type="primary" onClick={handleSubmit}>
-            Generate Bill
-          </Button>
-        </Space>
       </div>
     </>
   );

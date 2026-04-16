@@ -1,16 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Color Palette - Lite Blue Theme */
-  --bg-primary: #e0f2fe; /* Very light blue */
-  --bg-secondary: #f0f9ff;
-  --text-primary: #0f172a;
-  --text-secondary: #334155;
-  --accent-blue: #0ea5e9;
-  --accent-blue-hover: #0284c7;
-  --glass-bg: rgba(255, 255, 255, 0.4);
-  --glass-border: rgba(255, 255, 255, 0.8);
-  --glass-shadow: 0 8px 32px 0 rgba(14, 165, 233, 0.1);
+  /* Color Palette - Premium Light Blue & White Theme */
+  --bg-primary: #f8fafc; /* Clean off-white bg */
+  --bg-secondary: #f0f9ff; /* Very soft blue */
+  --white: #ffffff;
+  --text-primary: #1e293b; /* Slate 800 */
+  --text-secondary: #64748b; /* Slate 500 */
+  --accent-blue: #0ea5e9; /* Sky 500 */
+  --accent-blue-hover: #0284c7; /* Sky 700 */
+  --accent-blue-pale: #e0f2fe; /* Sky 100 */
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-border: #e2e8f0;
+  --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --error: #ef4444;
   --success: #10b981;
 }

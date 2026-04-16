@@ -1,68 +1,64 @@
-import React, { createContext, useState, useEffect } from 'react';
-import axiosInstance from '../api/axiosInstance';
-import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-export const AuthContext = createContext();
+const axiosInstance = axios.create({
+  baseURL: 'http://localhost:5000/api',
+  withCredentials: true, // Important for cookies
+});
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const token = sessionStorage.getItem('accessToken');
-      if (token) {
-        try {
-          const res = await axiosInstance.get('/auth/me');
-          setUser(res.data);
-        } catch (error) {
-          console.error("Auth check failed:", error);
-          sessionStorage.removeItem('accessToken');
-        }
-      }
-      setLoading(false);
-    };
-
-    checkAuth();
-
-    // Listen for auth errors from axios interceptor
-    const handleAuthError = () => {
-      setUser(null);
-      navigate('/login');
-    };
-
-    window.addEventListener('auth-error', handleAuthError);
-    return () => window.removeEventListener('auth-error', handleAuthError);
-  }, [navigate]);
-
-  const login = async (email, password) => {
-    const res = await axiosInstance.post('/auth/login', { email, password });
-    sessionStorage.setItem('accessToken', res.data.accessToken);
-    setUser(res.data.user);
-    navigate('/');
-  };
-
-  const signup = async (userData) => {
-    await axiosInstance.post('/auth/signup', userData);
-    navigate('/login');
-  };
-
-  const logout = async () => {
-    try {
-      await axiosInstance.post('/auth/logout');
-    } catch (error) {
-      console.error("Logout error", error);
-    } finally {
-      sessionStorage.removeItem('accessToken');
-      setUser(null);
-      navigate('/login');
+// Request interceptor to add the access token to headers
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem('accessToken');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
-  };
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-  return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
-      {!loading && children}
-    </AuthContext.Provider>
-  );
-};
+// Response interceptor to handle token refresh
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+
+    // If error is 401 (Unauthorized) and not retried yet
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        // Call refresh token endpoint (cookie will be sent automatically)
+        const response = await axios.post('http://localhost:5000/api/auth/refresh', {}, {
+          withCredentials: true
+        });
+
+        const newAccessToken = response.data.accessToken;
+
+        // Store new access token
+        sessionStorage.setItem('accessToken', newAccessToken);
+
+        // Update authorization header
+        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+
+        // Retry original request
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
+        console.error('Refresh token failed:', refreshError);
+        // Clear session storage just in case
+        sessionStorage.removeItem('accessToken');
+        // Dispatch an event so AuthContext can logout
+        window.dispatchEvent(new Event('auth-error'));
+        return Promise.reject(refreshError);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export default axiosInstance;
