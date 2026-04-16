@@ -53,3 +53,21 @@ exports.deleteUser = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
+
+// 🔥 UPDATE PROFILE (Self)
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, email, phone } = req.body;
+    
+    // We get the user ID from the 'protect' middleware (req.user)
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, email, phone },
+      { new: true }
+    ).select("-password");
+
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};

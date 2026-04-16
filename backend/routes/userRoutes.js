@@ -6,11 +6,13 @@ const {
   createUser,
   updateUser,
   deleteUser,
+  updateProfile,
 } = require("../controllers/userController");
 
 const { protect, isAdmin } = require("../middleware/authMiddleware");
 
 // 🔐 Protected routes
+router.put("/profile", protect, updateProfile); // Self update
 router.get("/", protect, isAdmin, getUsers);
 router.post("/", protect, isAdmin, createUser);
 router.put("/:id", protect, isAdmin, updateUser);
