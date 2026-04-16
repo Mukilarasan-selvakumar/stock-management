@@ -1,0 +1,10 @@
+flask
+flask-cors
+pandas
+scikit-learn
+statsmodels
+prophet
+lightgbm
+numpy
+python-dotenv
+pymongo
