@@ -55,7 +55,7 @@ const Login = () => {
           >
             <div style={{ marginBottom: 30 }}>
               <Title level={2} style={{ margin: 0 }}>Welcome Back</Title>
-              <Text type="secondary">Enter your credentials to access your store</Text>
+              
             </div>
 
             {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 20, borderRadius: 12 }} />}

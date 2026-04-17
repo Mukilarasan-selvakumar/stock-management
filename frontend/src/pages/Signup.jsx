@@ -56,7 +56,7 @@ const Signup = () => {
           >
             <div style={{ marginBottom: 30 }}>
               <Title level={2} style={{ margin: 0 }}>Create Account</Title>
-              <Text type="secondary">Join thousands of optimized stores today</Text>
+              
             </div>
 
             {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 20, borderRadius: 12 }} />}
