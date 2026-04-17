@@ -37,16 +37,10 @@ const Login = () => {
         {/* Decorative Side */}
         <Col xs={0} md={12}>
           <div style={{ color: "#1e293b" }}>
-            <RocketOutlined style={{ fontSize: 60, color: "#0ea5e9", marginBottom: 20 }} />
+          
             <Title level={1} style={{ fontSize: 48, fontWeight: 800, margin: 0, color: "#1e293b" }}>
-              Inventory <span style={{ color: "#0ea5e9" }}>Edge</span>
+              Store <span style={{ color: "#0ea5e9" }}>App</span>
             </Title>
-            <Title level={3} style={{ marginTop: 0, fontWeight: 500, color: "#64748b" }}>
-              Next-gen Store Optimization System
-            </Title>
-            <p style={{ fontSize: 18, color: "#64748b", maxWidth: 400 }}>
-              AI-driven demand forecasting, real-time stock tracking, and advanced billing solutions for modern retailers.
-            </p>
           </div>
         </Col>
 
