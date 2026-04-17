@@ -18,13 +18,11 @@ app = Flask(__name__)
 CORS(app)
 
 # MongoDB Connection
-MONGO_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 client = MongoClient(MONGO_URI)
 db = client["test"]
 
-# -----------------------------
-# 🔥 MODEL FUNCTIONS
-# -----------------------------
+#MODELS
 
 def run_arima(sales_data, days):
     try:
@@ -113,9 +111,7 @@ def predict_all():
             if len(sales_data) == 0:
                 continue
 
-            # -----------------------------
-            # 🔥 MODEL SELECTION
-            # -----------------------------
+
             if forced_model:
                 model_used = forced_model
             else:
@@ -128,9 +124,7 @@ def predict_all():
 
             forecast_days = 14
 
-            # -----------------------------
-            # 🔥 RUN MODEL
-            # -----------------------------
+
             prediction = None
 
             if model_used == "ARIMA":
@@ -143,15 +137,10 @@ def predict_all():
             elif model_used == "LightGBM":
                 prediction = run_lightgbm(sales_data, forecast_days)
 
-            # -----------------------------
-            # 🔥 FALLBACK
-            # -----------------------------
             if prediction is None:
                 prediction = fallback_prediction(sales_data, forecast_days)
 
-            # -----------------------------
-            # 🔥 BUSINESS LOGIC
-            # -----------------------------
+
             avg_demand = np.mean(sales_data)
             std_dev = np.std(sales_data) if len(sales_data) > 1 else 0
 

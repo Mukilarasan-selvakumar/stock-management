@@ -12,7 +12,7 @@ app = Flask(__name__)
 CORS(app)
 
 # MongoDB Connection
-MONGO_URI = os.getenv("MONGODB_URI")
+MONGO_URI = os.getenv("MONGO_URI")
 if not MONGO_URI:
     print("ERROR: MONGODB_URI not found in environment variables!")
 else:
