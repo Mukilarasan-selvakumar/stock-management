@@ -43,13 +43,13 @@
   transition: all 0.3s ease;
 }
 
-/* 🔥 HOVER EFFECT */
+/*  HOVER EFFECT */
 .nav-links a:hover {
   background: #f0f9ff;
   color: #0ea5e9;
 }
 
-/* 🔥 ACTIVE STATE */
+/*  ACTIVE STATE */
 .nav-links .active {
   color: #0ea5e9;
   background: #e0f2fe;

@@ -78,7 +78,7 @@ const Dashboard = () => {
           </Col>
         </Row>
 
-        {/* ✏️ EDIT PROFILE MODAL */}
+        {/*  EDIT PROFILE MODAL */}
         <Modal
           title="Update Profile"
           open={isModalOpen}

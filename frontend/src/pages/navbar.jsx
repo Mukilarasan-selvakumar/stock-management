@@ -12,7 +12,7 @@ const Navbar = () => {
       <div className="logo">StoreApp</div>
 
       <div className="right-section">
-        {/* 🔥 NAV LINKS */}
+        {/*  NAV LINKS */}
         <nav className="nav-links">
           <NavLink to="/" className={({ isActive }) => isActive ? "active" : ""}>
             Dashboard
@@ -39,7 +39,7 @@ const Navbar = () => {
           )}
         </nav>
 
-        {/* 🔥 USER */}
+        {/*  USER */}
         <div className="user-section">
           <div className="userAvatar">
             {user?.name?.charAt(0).toUpperCase()}

@@ -14,7 +14,7 @@ const Analytics = () => {
   const [results, setResults] = useState([]);
   const [topCustomers, setTopCustomers] = useState([]);
 
-  // ✅ DEFAULT = Prophet
+  //  DEFAULT = Prophet
   const [selectedModel, setSelectedModel] = useState("Prophet");
 
   // Fetch Data
@@ -89,7 +89,7 @@ const Analytics = () => {
     },
     { title: "Reorder", dataIndex: "recommended_qty" },
 
-    // ✅ MODEL TAG
+    //  MODEL TAG
     {
       title: "Model",
       dataIndex: "model_used",
@@ -111,14 +111,14 @@ const Analytics = () => {
           <Row justify="space-between" align="middle">
             <Col>
               <Title level={3}>
-                <ExperimentOutlined /> AI Analytics
+                 AI Analytics
               </Title>
               <Text>Demand Prediction Dashboard</Text>
             </Col>
 
             <Col>
               <Space>
-                {/* ✅ DROPDOWN WITH TAG */}
+                {/*  DROPDOWN WITH TAG */}
                 <Select
                   value={selectedModel}
                   style={{ width: 200 }}

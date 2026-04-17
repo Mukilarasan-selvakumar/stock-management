@@ -10,7 +10,7 @@ const Users = () => {
   const [editUser, setEditUser] = useState(null);
   const [form] = Form.useForm();
 
-  // 🔥 FETCH USERS
+  //  FETCH USERS
   const fetchUsers = async () => {
     const res = await axiosInstance.get("/users");
     setUsers(res.data);
@@ -20,7 +20,7 @@ const Users = () => {
     fetchUsers();
   }, []);
 
-  // 🔥 OPEN MODAL
+  //  OPEN MODAL
   const handleAdd = () => {
     setEditUser(null);
     form.resetFields();
@@ -33,13 +33,13 @@ const Users = () => {
     setOpen(true);
   };
 
-  // 🔥 DELETE
+  //  DELETE
   const handleDelete = async (id) => {
     await axiosInstance.delete(`/users/${id}`);
     fetchUsers();
   };
 
-  // 🔥 SUBMIT
+  //  SUBMIT
   const handleSubmit = async () => {
     const values = await form.validateFields();
 
@@ -53,7 +53,7 @@ const Users = () => {
     fetchUsers();
   };
 
-  // ✅ TABLE COLUMNS
+  //  TABLE COLUMNS
   const columns = [
     {
       title: "Name",
@@ -99,7 +99,7 @@ const Users = () => {
     <div style={{ background: "#f8fafc", minHeight: "100vh" }}>
       <Navbar />
       <div style={{ padding: 40 }}>
-        {/* 🔥 HEADER */}
+        {/*  HEADER */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 25 }}>
           <h2 style={{ margin: 0, fontWeight: 700, color: "#1e293b" }}>User & Role Management</h2>
           <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd} size="large" style={{ borderRadius: 10 }}>

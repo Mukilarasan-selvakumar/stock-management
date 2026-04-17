@@ -17,20 +17,20 @@ const Billing = () => {
     ]);
   };
 
-  // ❌ Remove row
+  //  Remove row
   const removeItem = (index) => {
     const updated = items.filter((_, i) => i !== index);
     setItems(updated);
   };
 
-  // 🔄 Update item
+  //  Update item
   const updateItem = (index, key, value) => {
     const updated = [...items];
     updated[index][key] = value;
     setItems(updated);
   };
 
-  // 🔥 FETCH PRODUCT FROM BACKEND
+  //  FETCH PRODUCT FROM BACKEND
   const fetchProduct = async (index, productId) => {
     if (!productId) return;
 
@@ -54,13 +54,13 @@ const Billing = () => {
     }
   };
 
-  // 🔥 Total calculation
+  //  Total calculation
   const totalAmount = items.reduce(
     (sum, item) => sum + (item.price || 0) * (item.quantity || 0),
     0
   );
 
-  // 🚀 Submit billing
+  //  Submit billing
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
@@ -87,7 +87,7 @@ const debouncedFetchProduct = useMemo(() => {
     fetchProduct(index, value);
   }, 1000);
 }, []);
-  // 🧾 Table columns
+  //  Table columns
   const columns = [
     {
       title: "Product ID",
@@ -156,7 +156,7 @@ const debouncedFetchProduct = useMemo(() => {
 
           <div style={{ background: "#fff", padding: 30, borderRadius: 16, boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
             
-            {/* 👤 CUSTOMER FORM */}
+            {/*  CUSTOMER FORM */}
             <Form form={form} layout="vertical">
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "20px" }}>
                 <Form.Item
@@ -179,7 +179,7 @@ const debouncedFetchProduct = useMemo(() => {
 
             <div style={{ margin: "20px 0", borderTop: "1px solid #f1f5f9" }} />
 
-            {/* 📊 TABLE SECTION */}
+            {/*  TABLE SECTION */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 15 }}>
               <h3 style={{ margin: 0, color: "#1e293b" }}>Product Items</h3>
               <Button
@@ -200,7 +200,7 @@ const debouncedFetchProduct = useMemo(() => {
               style={{ marginBottom: 20 }}
             />
 
-            {/* 💰 SUMMARY & SUBMIT */}
+            {/*  SUMMARY & SUBMIT */}
             <div style={{ 
               background: "#f0f9ff", 
               padding: 20, 
