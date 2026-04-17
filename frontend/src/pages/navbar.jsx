@@ -12,7 +12,7 @@ const Navbar = () => {
       <div className="logo">StoreApp</div>
 
       <div className="right-section">
-        {/*  NAV LINKS */}
+        {/* NAV LINKS */}
         <nav className="nav-links">
           <NavLink to="/" className={({ isActive }) => isActive ? "active" : ""}>
             Dashboard
@@ -26,25 +26,32 @@ const Navbar = () => {
             Billing
           </NavLink>
 
-          {user?.role === "superadmin" && (
+          {/* ADMIN + SUPERADMIN */}
+          {(user?.role === "admin" || user?.role === "superadmin") && (
             <>
-              <NavLink to="/users" className={({ isActive }) => isActive ? "active" : ""}>
-                Users
-              </NavLink>
-
               <NavLink to="/stocks" className={({ isActive }) => isActive ? "active" : ""}>
                 Stock
               </NavLink>
             </>
           )}
+
+          {/* ONLY SUPERADMIN */}
+          {user?.role === "superadmin" && (
+            <>
+              <NavLink to="/users" className={({ isActive }) => isActive ? "active" : ""}>
+                Users
+              </NavLink>
+            </>
+          )}
         </nav>
 
-        {/*  USER */}
+        {/* USER SECTION */}
         <div className="user-section">
           <div className="userAvatar">
-            {user?.name?.charAt(0).toUpperCase()}
+            {user?.name?.charAt(0)?.toUpperCase()}
           </div>
           <span>{user?.name}</span>
+
           <button
             onClick={() => {
               logout();
