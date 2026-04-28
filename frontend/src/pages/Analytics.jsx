@@ -153,7 +153,9 @@ const Analytics = () => {
 
         {/* LOADING */}
         {loading ? (
+          <div style={{display:"flex",alignItems:"center",justifyContent:"center" , margin:"50px"}}>  
           <Spin size="large" />
+           </div>
         ) : results.length === 0 ? (
           <Empty description="No Data">
             <Button type="primary" onClick={runFullPipeline}>

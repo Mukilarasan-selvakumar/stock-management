@@ -14,23 +14,34 @@ const Navbar = () => {
       <div className="right-section">
         {/* NAV LINKS */}
         <nav className="nav-links">
-          <NavLink to="/" className={({ isActive }) => isActive ? "active" : ""}>
+          <NavLink
+            to="/"
+            className={({ isActive }) => (isActive ? "active" : "")}
+          >
             Dashboard
           </NavLink>
 
-          <NavLink to="/analytics" className={({ isActive }) => isActive ? "active" : ""}>
-            Analytics
-          </NavLink>
-
-          <NavLink to="/billing" className={({ isActive }) => isActive ? "active" : ""}>
+          <NavLink
+            to="/billing"
+            className={({ isActive }) => (isActive ? "active" : "")}
+          >
             Billing
           </NavLink>
 
           {/* ADMIN + SUPERADMIN */}
           {(user?.role === "admin" || user?.role === "superadmin") && (
             <>
-              <NavLink to="/stocks" className={({ isActive }) => isActive ? "active" : ""}>
+              <NavLink
+                to="/stocks"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
                 Stock
+              </NavLink>
+              <NavLink
+                to="/analytics"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Analytics
               </NavLink>
             </>
           )}
@@ -38,7 +49,10 @@ const Navbar = () => {
           {/* ONLY SUPERADMIN */}
           {user?.role === "superadmin" && (
             <>
-              <NavLink to="/users" className={({ isActive }) => isActive ? "active" : ""}>
+              <NavLink
+                to="/users"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
                 Users
               </NavLink>
             </>
