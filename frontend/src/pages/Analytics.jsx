@@ -15,7 +15,7 @@ const Analytics = () => {
   const [topCustomers, setTopCustomers] = useState([]);
 
   //  DEFAULT = Prophet
-  const [selectedModel, setSelectedModel] = useState("Prophet");
+  const [selectedModel, setSelectedModel] = useState("analyze");
 
   // Fetch Data
   const fetchData = async () => {
@@ -43,15 +43,17 @@ const Analytics = () => {
     setLoading(true);
     try {
       message.loading({ content: "Cleaning data...", key: "pipeline" });
-      await axiosInstance.post("/process/process-all");
-
+      const res = await axiosInstance.post("/process/process-all",{
+        analyze:selectedModel==="analyze"?true :false,
+        model: selectedModel==="analyze"?null :selectedModel
+      });
       message.loading({
         content: `Running ${selectedModel} predictions...`,
         key: "pipeline"
       });
 
       await axiosInstance.post("/predict/predict-all", {
-        model: selectedModel
+        model: res?.data?.recommended_model
       });
 
       message.success({
@@ -118,7 +120,7 @@ const Analytics = () => {
           <Row justify="space-between" align="middle">
             <Col>
               <Title level={3}>
-                 AI Analytics
+                 Analytics
               </Title>
               <Text>Demand Prediction Dashboard</Text>
             </Col>
@@ -134,13 +136,11 @@ const Analytics = () => {
                   <Option value="ARIMA">ARIMA</Option>
 
                   <Option value="Prophet">
-                    Prophet{" "}
-                    <Tag color="green" style={{ marginLeft: 6 }}>
-                      Recommended
-                    </Tag>
+                    Prophet
                   </Option>
 
                   <Option value="LightGBM">LightGBM</Option>
+                   <Option value="analyze">Analyze and Recommend</Option>
                 </Select>
 
                 <Button
