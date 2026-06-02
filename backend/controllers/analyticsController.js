@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
-// We don't necessarily need a strict Mongoose model if we're just reading results
-// but it's better to have one for consistency.
+
 const predictionOutputSchema = new mongoose.Schema({
     productId: String,
     productName: String,

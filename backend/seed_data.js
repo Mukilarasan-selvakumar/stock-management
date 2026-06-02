@@ -37,13 +37,13 @@ const seedData = async () => {
         await mongoose.connect(MONGO_URI);
         console.log("Connected to MongoDB for seeding...");
 
-        // 1. Clear existing data
+        
         await Product.deleteMany({});
         await Inventory.deleteMany({});
         await Sale.deleteMany({});
         console.log("Cleared existing collections.");
 
-        // 2. Sample Products
+        
         const sampleProducts = [
             { productId: "P001", name: "Premium Cotton T-Shirt", category: "Apparel", price: 25 },
             { productId: "P002", name: "Wireless Headphones", category: "Electronics", price: 120 },
@@ -56,7 +56,7 @@ const seedData = async () => {
         await Product.insertMany(sampleProducts);
         console.log("Inserted Sample Products.");
 
-        // 3. Sample Inventory
+        
         const sampleInventory = [
             { productId: "P001", stock: 15, lastUpdated: new Date() }, // Low stock (Understock)
             { productId: "P002", stock: 200, lastUpdated: new Date() }, // High stock (Overstock)
@@ -69,7 +69,7 @@ const seedData = async () => {
         await Inventory.insertMany(sampleInventory);
         console.log("Inserted Sample Inventory.");
 
-        // 4. Sample Sales History (Last 30 days)
+        
         const sampleSales = [];
         const customers = [
             { name: "Alice Smith", email: "alice@example.com", phone: "1234567890" },
@@ -81,13 +81,13 @@ const seedData = async () => {
             const date = new Date();
             date.setDate(date.getDate() - i);
 
-            // Generate 1-3 sales per day
+            
             const dailyOrders = Math.floor(Math.random() * 3) + 1;
             
             for (let j = 0; j < dailyOrders; j++) {
                 const customer = customers[Math.floor(Math.random() * customers.length)];
                 
-                // Random items in sale
+                
                 const product = sampleProducts[Math.floor(Math.random() * sampleProducts.length)];
                 const qty = Math.floor(Math.random() * 5) + 1;
 

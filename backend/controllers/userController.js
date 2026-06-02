@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require('bcryptjs');
 
-// 🔥 GET ALL USERS
+
 exports.getUsers = async (req, res) => {
   try {
     const users = await User.find().select("-password"); // hide password
@@ -11,7 +11,7 @@ exports.getUsers = async (req, res) => {
   }
 };
 
-// 🔥 CREATE USER
+
 exports.createUser = async (req, res) => {
   try {
     const { name, email, phone, password, role } = req.body;
@@ -32,7 +32,7 @@ exports.createUser = async (req, res) => {
   }
 };
 
-// 🔥 UPDATE USER
+
 exports.updateUser = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(
@@ -47,7 +47,7 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// 🔥 DELETE USER
+
 exports.deleteUser = async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.id);
@@ -57,12 +57,12 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-// 🔥 UPDATE PROFILE (Self)
+
 exports.updateProfile = async (req, res) => {
   try {
     const { name, email, phone } = req.body;
     
-    // We get the user ID from the 'protect' middleware (req.user)
+    
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
       { name, email, phone },

@@ -13,7 +13,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// 🔥 ROUTES
+
 app.use("/sales", require("./routes/saleRoutes"));
 
 const PORT = process.env.PORT || 6000;

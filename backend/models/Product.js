@@ -32,5 +32,4 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-// 👇 IMPORTANT: match existing collection name
 module.exports = mongoose.model("Product", productSchema, "products");

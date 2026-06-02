@@ -9,7 +9,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require("./routes/userRoutes");
 const inventoryRoutes = require("./routes/inventoryRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
-require("./utils/scheduler"); // Initialize scheduler
+require("./utils/scheduler");
 
 dotenv.config();
 connectDB();
@@ -21,14 +21,14 @@ app.use(cors({
   credentials: true
 }));
 
-// 🔥 👉 PROXY MUST BE BEFORE body parsers!
+
 app.use(
   "/api/billing",
   createProxyMiddleware({
-    target: "http://localhost:6000", // billing service
+    target: "http://localhost:6000",
     changeOrigin: true,
     pathRewrite: {
-      "^/api/billing": "", // strip the /api/billing prefix
+      "^/api/billing": "",
     },
   })
 );
@@ -36,10 +36,10 @@ app.use(
 app.use(
   "/api/process",
   createProxyMiddleware({
-    target: "http://localhost:7000", // data processing service
+    target: "http://localhost:7000",
     changeOrigin: true,
     pathRewrite: {
-      "^/api/process": "", 
+      "^/api/process": "",
     },
   })
 );
@@ -47,10 +47,10 @@ app.use(
 app.use(
   "/api/predict",
   createProxyMiddleware({
-    target: "http://localhost:8000", // prediction service
+    target: "http://localhost:8000",
     changeOrigin: true,
     pathRewrite: {
-      "^/api/predict": "", 
+      "^/api/predict": "",
     },
   })
 );
@@ -58,7 +58,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// 🔥 ROUTES
+
 app.use('/api/auth', authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/inventory", inventoryRoutes);

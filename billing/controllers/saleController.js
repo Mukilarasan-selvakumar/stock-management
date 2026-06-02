@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-//pdf genaration
+
 const generateInvoicePDF = (sale) => {
   return new Promise((resolve, reject) => {
     const invoiceDir = path.join(__dirname, "../invoices");
@@ -164,7 +164,7 @@ const generateInvoicePDF = (sale) => {
 };
 
 
-//invoice sender
+
 const sendInvoiceMail = async (sale) => {
   try {
     const pdfPath = await generateInvoicePDF(sale);
@@ -223,7 +223,7 @@ const sendInvoiceMail = async (sale) => {
 };
 
 
-//billing creation
+
 
 exports.createSale = async (req, res) => {
   try {

@@ -6,7 +6,7 @@ exports.getInventory = async (req, res) => {
     const data = await Inventory.aggregate([
       {
         $lookup: {
-          from: "products", // collection name
+          from: "products",
           localField: "productId",
           foreignField: "productId",
           as: "productDetails",
@@ -36,17 +36,17 @@ exports.getInventory = async (req, res) => {
   }
 };
 
-// CREATE
+
 
 
 exports.createInventory = async (req, res) => {
   try {
     const { productId, stock, name, category, price } = req.body;
 
-    // 🔥 check product exists
+    
     let product = await Product.findOne({ productId });
 
-    // 👉 if not exist → create
+    
     if (!product) {
       product = await Product.create({
         productId,
@@ -56,7 +56,7 @@ exports.createInventory = async (req, res) => {
       });
     }
 
-    // 👉 create inventory
+    
     const item = await Inventory.create({
       productId,
       stock,
@@ -68,7 +68,7 @@ exports.createInventory = async (req, res) => {
   }
 };
 
-// UPDATE
+
 exports.updateInventory = async (req, res) => {
   const item = await Inventory.findByIdAndUpdate(
     req.params.id,
@@ -78,7 +78,7 @@ exports.updateInventory = async (req, res) => {
   res.json(item);
 };
 
-// DELETE
+
 exports.deleteInventory = async (req, res) => {
   await Inventory.findByIdAndDelete(req.params.id);
   res.json({ message: "Deleted" });

@@ -115,15 +115,15 @@ def calculate_backtesting_accuracy(sales_data, model_func, prepared_data, test_d
         if len(sales_data) <= test_days + 5:
             return None
         
-        # Split data
+        
         train_data = sales_data[:-test_days]
         test_data = sales_data[-test_days:]
         
-        # Create prepared data for training
+        
         train_prepared = prepared_data.copy()
         train_prepared['historical_sales'] = train_data
         
-        # Predict
+        
         if model_func == "ARIMA":
             prediction_total = run_arima(train_prepared, test_days)
         elif model_func == "Prophet":
@@ -136,18 +136,18 @@ def calculate_backtesting_accuracy(sales_data, model_func, prepared_data, test_d
         if prediction_total is None:
             return None
         
-        # Distribute prediction across test days
+        
         pred_per_day = prediction_total / test_days
         predictions = [pred_per_day] * test_days
         
-        # Calculate metrics
+        
         actuals = np.array(test_data)
         preds = np.array(predictions)
         
         mae = mean_absolute_error(actuals, preds)
         rmse = np.sqrt(mean_squared_error(actuals, preds))
         
-        # MAPE (avoid division by zero)
+        
         non_zero_mask = actuals > 0
         if np.any(non_zero_mask):
             mape = np.mean(np.abs((actuals[non_zero_mask] - preds[non_zero_mask]) / actuals[non_zero_mask])) * 100
@@ -156,7 +156,7 @@ def calculate_backtesting_accuracy(sales_data, model_func, prepared_data, test_d
         
         accuracy = max(0, 100 - mape)
         
-        # R2 Score
+        
         try:
             r2 = r2_score(actuals, preds)
         except:
@@ -212,7 +212,7 @@ def predict_all():
             
             sales_data = prepared_data.get('historical_sales', [])
             
-            # Calculate accuracy for this product (backtesting)
+            
             product_accuracy = None
             if len(sales_data) > 14:
                 product_accuracy = calculate_backtesting_accuracy(sales_data, model_used, prepared_data)
@@ -221,7 +221,7 @@ def predict_all():
                     all_accuracy_scores.append(product_accuracy)
                     model_accuracy_scores[model_used].append(product_accuracy['accuracy'])
 
-            # Run prediction
+            
             if model_used == "ARIMA":
                 prediction = run_arima(prepared_data, forecast_days)
             elif model_used == "Prophet":
@@ -281,7 +281,7 @@ def predict_all():
             
             results.append(result)
 
-        # Save results
+        
         if results:
             db.predictions_output.delete_many({})
             db.predictions_output.insert_many(results)
@@ -301,7 +301,7 @@ def predict_all():
                 'total_tested': len(all_accuracy_scores)
             }
         
-        # Per-model accuracy
+        
         per_model_accuracy = {}
         for model, scores in model_accuracy_scores.items():
             if scores:
@@ -310,7 +310,7 @@ def predict_all():
                     'samples': len(scores)
                 }
         
-        # Get rating
+        
         accuracy_rating = "Excellent" if overall_metrics.get('avg_accuracy', 0) >= 80 else "Good" if overall_metrics.get('avg_accuracy', 0) >= 60 else "Poor" if overall_metrics.get('avg_accuracy', 0) >= 40 else "Very Poor"
         
         # ============================================
@@ -427,7 +427,7 @@ def get_urgent_reorder():
 def get_accuracy_report():
     """Get latest accuracy report"""
     try:
-        # Get latest predictions with accuracy data
+        
         predictions = list(db.predictions_output.find({"model_accuracy": {"$exists": True}}))
         
         if not predictions:
