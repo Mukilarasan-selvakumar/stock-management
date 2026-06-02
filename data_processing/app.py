@@ -89,10 +89,12 @@ def process_data():
         data = request.json
         df = pd.DataFrame(data.get('raw_data', []))
         if not df.empty:
-             df = df.ffill().fillna(0)
+            df = df.ffill().fillna(0)
         return jsonify({"processed_data": df.to_dict(orient='records')})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=7000, debug=True)
+
+
