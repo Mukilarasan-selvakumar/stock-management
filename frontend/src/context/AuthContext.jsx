@@ -51,12 +51,12 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await axiosInstance.post('/auth/logout');
+      navigate('/login');
     } catch (error) {
       console.error("Logout error", error);
     } finally {
       sessionStorage.removeItem('accessToken');
       setUser(null);
-      navigate('/login');
     }
   };
 

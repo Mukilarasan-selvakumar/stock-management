@@ -155,7 +155,7 @@ const Billing = () => {
 
   return (
     <>
-      <Navbar />
+      <Navbar >
 
       <div
         style={{
@@ -256,6 +256,8 @@ const Billing = () => {
           </div>
         </div>
       </div>
+            </Navbar>
+
     </>
   );
 };

@@ -38,7 +38,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <Navbar />
+      <Navbar >
 
       <div style={{ padding: "40px", background: "#f0f2f5", minHeight: "100vh" }}>
         <Row justify="center">
@@ -101,6 +101,8 @@ const Dashboard = () => {
         </Modal>
 
       </div>
+            </Navbar>
+
     </>
   );
 };

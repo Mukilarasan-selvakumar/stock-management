@@ -1,4 +1,75 @@
+# Dependencies
 node_modules/
-dist/
+
+# Environment Variables
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build Folders
+dist/
+build/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime Data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+coverage/
+
+# Cache
+.cache/
+.parcel-cache/
+
+# OS Files
 .DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# JetBrains IDE
+.idea/
+
+# Temporary Files
+*.tmp
+*.temp
+
+# MongoDB
+dump/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.env.python
+
+# Flask
+instance/
+*.sqlite3
+
+# Uploads
+uploads/
+
+# Generated Files
+*.csv
+*.xlsx
+*.pdf
+
+# React
+.eslintcache
+# Package lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

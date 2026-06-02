@@ -85,9 +85,10 @@ const Analytics = () => {
     },
     {
       title: "Demand",
-      dataIndex: "predicted_demand"
+      dataIndex: "predicted_demand",
+       render: (value) => Math.round(value),
     },
-    { title: "Reorder", dataIndex: "recommended_qty" },
+    { title: "Reorder", dataIndex: "recommended_qty" , render: (value) => Math.round(value),},
 
     //  MODEL TAG
     {
@@ -103,7 +104,7 @@ const Analytics = () => {
 
   return (
     <>
-      <Navbar />
+      <Navbar>
 
       <div style={{ padding: 30 }}>
         {/* HEADER */}
@@ -209,6 +210,8 @@ const Analytics = () => {
           </Tabs>
         )}
       </div>
+            </Navbar>
+
     </>
   );
 };

@@ -96,13 +96,15 @@ const Users = () => {
   ];
 
   return (
+    <>
+          <Navbar>
+
     <div style={{ background: "#f8fafc", minHeight: "100vh" }}>
-      <Navbar />
       <div style={{ padding: 40 }}>
         {/*  HEADER */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 25 }}>
           <h2 style={{ margin: 0, fontWeight: 700, color: "#1e293b" }}>User & Role Management</h2>
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd} size="large" style={{ borderRadius: 10 }}>
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd} size="medium" style={{ borderRadius: 10 }}>
             Add New User
           </Button>
         </div>
@@ -161,6 +163,9 @@ const Users = () => {
       </Modal>
 </div>
     </div>
+          </Navbar>
+
+    </>
   );
 };
 
