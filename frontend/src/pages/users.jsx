@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 import { Table, Button, Modal, Form, Input, Select } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+import Swal from "sweetalert2";
 import Navbar from "./navbar";
 
 const Users = () => {
@@ -10,50 +15,121 @@ const Users = () => {
   const [editUser, setEditUser] = useState(null);
   const [form] = Form.useForm();
 
-  //  FETCH USERS
+  // FETCH USERS
   const fetchUsers = async () => {
-    const res = await axiosInstance.get("/users");
-    setUsers(res.data);
+    try {
+      const res = await axiosInstance.get("/users");
+      setUsers(res.data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  //  OPEN MODAL
+  // ADD USER
   const handleAdd = () => {
     setEditUser(null);
     form.resetFields();
     setOpen(true);
   };
 
+  // EDIT USER
   const handleEdit = (record) => {
     setEditUser(record);
     form.setFieldsValue(record);
     setOpen(true);
   };
 
-  //  DELETE
+  // DELETE USER
   const handleDelete = async (id) => {
-    await axiosInstance.delete(`/users/${id}`);
-    fetchUsers();
-  };
+    const result = await Swal.fire({
+      title: "Delete User?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      confirmButtonColor: "#d33",
+    });
 
-  //  SUBMIT
-  const handleSubmit = async () => {
-    const values = await form.validateFields();
+    if (!result.isConfirmed) return;
 
-    if (editUser) {
-      await axiosInstance.put(`/users/${editUser._id}`, values);
-    } else {
-      await axiosInstance.post("/users", values);
+    try {
+      await axiosInstance.delete(`/users/${id}`);
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted",
+        text: "User deleted successfully",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      fetchUsers();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text:
+          error?.response?.data?.message ||
+          "Failed to delete user",
+      });
     }
-
-    setOpen(false);
-    fetchUsers();
   };
 
-  //  TABLE COLUMNS
+  // ADD / UPDATE USER
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+
+      if (editUser) {
+        await axiosInstance.put(`/users/${editUser._id}`, values);
+
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "User updated successfully",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } else {
+        await axiosInstance.post("/users", values);
+
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "User created successfully",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      }
+
+      setOpen(false);
+      fetchUsers();
+    } catch (error) {
+      let message =
+        error?.response?.data?.message ||
+        "Something went wrong";
+
+      if (message.includes("minimum allowed length")) {
+        message = "Password must be at least 6 characters long";
+      }
+
+      if (message.includes("duplicate key")) {
+        message = "Email already exists";
+      }
+
+      Swal.fire({
+        icon: "error",
+        title: "Validation Error",
+        text: message,
+      });
+    }
+  };
+
+  // TABLE COLUMNS
   const columns = [
     {
       title: "Name",
@@ -71,7 +147,17 @@ const Users = () => {
       title: "Role",
       dataIndex: "role",
       render: (role) => (
-        <span style={{ color: role === "superadmin" ? "green" : "gray" }}>
+        <span
+          style={{
+            color:
+              role === "superadmin"
+                ? "green"
+                : role === "admin"
+                ? "#1677ff"
+                : "gray",
+            fontWeight: 600,
+          }}
+        >
           {role}
         </span>
       ),
@@ -85,6 +171,7 @@ const Users = () => {
             onClick={() => handleEdit(record)}
             style={{ marginRight: 8 }}
           />
+
           <Button
             danger
             icon={<DeleteOutlined />}
@@ -96,76 +183,149 @@ const Users = () => {
   ];
 
   return (
-    <>
-          <Navbar>
-
-    <div style={{ background: "#f8fafc", minHeight: "100vh" }}>
-      <div style={{ padding: 40 }}>
-        {/*  HEADER */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 25 }}>
-          <h2 style={{ margin: 0, fontWeight: 700, color: "#1e293b" }}>User & Role Management</h2>
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd} size="medium" style={{ borderRadius: 10 }}>
-            Add New User
-          </Button>
-        </div>
-
-        {/* ✅ TABLE */}
-        <Table
-          dataSource={users}
-          columns={columns}
-          rowKey="_id"
-          style={{ 
-            background: "#fff", 
-            borderRadius: 12, 
-            overflow: "hidden", 
-            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" 
-          }}
-        />
-
-      {/* ✅ MODAL */}
-      <Modal
-        title={editUser ? "Edit User" : "Add User"}
-        open={open}
-        onOk={handleSubmit}
-        onCancel={() => setOpen(false)}
+    <Navbar>
+      <div
+        style={{
+          background: "#f8fafc",
+          minHeight: "100vh",
+        }}
       >
-        <Form form={form} layout="vertical">
-          <Form.Item name="name" label="Name" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
+        <div style={{ padding: 40 }}>
+          {/* HEADER */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 25,
+            }}
+          >
+            <h2
+              style={{
+                margin: 0,
+                fontWeight: 700,
+                color: "#1e293b",
+              }}
+            >
+              User & Role Management
+            </h2>
 
-          <Form.Item name="email" label="Email" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={handleAdd}
+              style={{ borderRadius: 10 }}
+            >
+              Add New User
+            </Button>
+          </div>
 
-          <Form.Item name="phone" label="Phone" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-         {!editUser && (
-  <Form.Item
-    name="password"
-    label="Password"
-    rules={[{ required: true, message: "Password is required" }]}
-  >
-    <Input.Password />
-  </Form.Item>
-)}
-          
+          {/* TABLE */}
+          <Table
+            dataSource={users}
+            columns={columns}
+            rowKey="_id"
+            style={{
+              background: "#fff",
+              borderRadius: 12,
+              overflow: "hidden",
+              boxShadow:
+                "0 4px 6px -1px rgba(0,0,0,0.1)",
+            }}
+          />
 
-          <Form.Item name="role" label="Role" initialValue="user">
-            <Select>
-              <Select.Option value="user">User</Select.Option>
-              <Select.Option value="admin">Admin</Select.Option>
-              <Select.Option value="superadmin">Super Admin</Select.Option>
-            </Select>
-          </Form.Item>
-        </Form>
-      </Modal>
-</div>
-    </div>
-          </Navbar>
+          {/* MODAL */}
+          <Modal
+            title={editUser ? "Edit User" : "Add User"}
+            open={open}
+            onOk={handleSubmit}
+            onCancel={() => setOpen(false)}
+            okText={editUser ? "Update" : "Create"}
+          >
+            <Form form={form} layout="vertical">
+              <Form.Item
+                name="name"
+                label="Name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Name is required",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
 
-    </>
+              <Form.Item
+                name="email"
+                label="Email"
+                rules={[
+                  {
+                    required: true,
+                    message: "Email is required",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item
+                name="phone"
+                label="Phone"
+                rules={[
+                  {
+                    required: true,
+                    message: "Phone is required",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+              {!editUser && (
+                <Form.Item
+                  name="password"
+                  label="Password"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Password is required",
+                    },
+                    {
+                      min: 6,
+                      message:
+                        "Password must be at least 6 characters",
+                    },
+                  ]}
+                >
+                  <Input.Password />
+                </Form.Item>
+              )}
+
+              <Form.Item
+                name="role"
+                label="Role"
+                initialValue="user"
+              >
+                <Select>
+                  <Select.Option value="user">
+                    User
+                  </Select.Option>
+
+                  <Select.Option value="admin">
+                    Admin
+                  </Select.Option>
+
+                  <Select.Option value="superadmin">
+                    Super Admin
+                  </Select.Option>
+                </Select>
+              </Form.Item>
+            </Form>
+          </Modal>
+        </div>
+      </div>
+    </Navbar>
   );
 };
 
