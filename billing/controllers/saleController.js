@@ -6,9 +6,7 @@ const path = require("path");
 const Sale = require("../models/Sale");
 const Inventory = require("../models/Inventory");
 
-// =========================
-// Mail Transport
-// =========================
+
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -18,10 +16,8 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// =========================
-// Generate Invoice PDF
-// =========================
 
+//pdf genaration
 const generateInvoicePDF = (sale) => {
   return new Promise((resolve, reject) => {
     const invoiceDir = path.join(__dirname, "../invoices");
@@ -44,7 +40,7 @@ const generateInvoicePDF = (sale) => {
 
     doc.pipe(stream);
 
-    // Header
+
     doc
       .fontSize(24)
       .fillColor("#2563eb")
@@ -63,7 +59,7 @@ const generateInvoicePDF = (sale) => {
 
     doc.moveDown(2);
 
-    // Customer Details
+
     doc.fontSize(12);
 
     doc.text(`Invoice ID: ${sale._id}`);
@@ -74,7 +70,7 @@ const generateInvoicePDF = (sale) => {
 
     doc.moveDown(2);
 
-    // Table Header
+
     const tableTop = doc.y;
 
     doc.rect(50, tableTop, 500, 25).fill("#2563eb");
@@ -167,10 +163,8 @@ const generateInvoicePDF = (sale) => {
   });
 };
 
-// =========================
-// Send Email
-// =========================
 
+//invoice sender
 const sendInvoiceMail = async (sale) => {
   try {
     const pdfPath = await generateInvoicePDF(sale);
@@ -228,9 +222,8 @@ const sendInvoiceMail = async (sale) => {
   }
 };
 
-// =========================
-// Create Sale
-// =========================
+
+//billing creation
 
 exports.createSale = async (req, res) => {
   try {

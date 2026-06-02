@@ -36,7 +36,7 @@ const Navbar = ({ children }) => {
             }
           >
             <FiHome />
-            <span  style={{fontSize:"14px",color:"black"}}>Dashboard</span>
+            <span  style={{fontSize:"14px"}}>Dashboard</span>
           </NavLink>
 
           <NavLink

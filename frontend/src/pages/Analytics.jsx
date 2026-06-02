@@ -73,7 +73,19 @@ const Analytics = () => {
   // Table Columns
   const columns = [
     { title: "Product", dataIndex: "productName" },
-    { title: "ID", dataIndex: "productId" },
+    { title: "ID", dataIndex: "productId" },{
+      title: "Current Stock",
+      dataIndex: "current_stock",
+       render: (value) => Math.round(value),
+    }
+    ,
+    {
+      title: "Demand",
+      dataIndex: "predicted_demand",
+       render: (value) => Math.round(value),
+    },
+    { title: "Reorder", dataIndex: "recommended_qty" , render: (value) => Math.round(value)},
+    
     {
       title: "Stock",
       dataIndex: "stock_status",
@@ -83,12 +95,6 @@ const Analytics = () => {
         </Tag>
       )
     },
-    {
-      title: "Demand",
-      dataIndex: "predicted_demand",
-       render: (value) => Math.round(value),
-    },
-    { title: "Reorder", dataIndex: "recommended_qty" , render: (value) => Math.round(value),},
 
     //  MODEL TAG
     {
@@ -139,7 +145,6 @@ const Analytics = () => {
 
                 <Button
                   type="primary"
-                  icon={<RocketOutlined />}
                   onClick={runFullPipeline}
                   loading={loading}
                 >
