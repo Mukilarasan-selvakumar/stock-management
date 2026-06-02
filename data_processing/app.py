@@ -7,7 +7,6 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 from datetime import datetime
 from collections import defaultdict
-import json
 
 load_dotenv()
 
@@ -24,50 +23,85 @@ client = MongoClient(MONGO_URI if MONGO_URI else "mongodb://localhost:27017")
 db = client["test"]
 
 # ============================================
-# MODEL RECOMMENDATION ENGINE
+# VALIDATION FUNCTIONS
 # ============================================
+
+def can_use_prophet(sales_list, dates_list):
+    """Check if data is actually valid for Prophet"""
+    if len(sales_list) < 30:
+        return False, f"Insufficient data: {len(sales_list)} days (need 30+)"
+    
+    if len(sales_list) != len(dates_list):
+        return False, f"Length mismatch: sales={len(sales_list)}, dates={len(dates_list)}"
+    
+    # Clean and check dates
+    clean_dates = []
+    for d in dates_list:
+        if isinstance(d, str):
+            clean = d.split('T')[0][:10]
+        elif hasattr(d, 'strftime'):
+            clean = d.strftime('%Y-%m-%d')
+        else:
+            clean = str(d)[:10]
+        clean_dates.append(clean)
+    
+    # Check for duplicates
+    if len(set(clean_dates)) != len(clean_dates):
+        return False, "Duplicate dates found"
+    
+    # Check date continuity (optional but good)
+    try:
+        date_series = pd.to_datetime(clean_dates)
+        date_diff = date_series.diff().dropna()
+        if (date_diff.dt.days > 1).any():
+            print(f"Warning: Gaps in dates detected")
+    except:
+        pass
+    
+    return True, "Valid for Prophet"
+
+
+def can_use_lightgbm(sales_list):
+    """Check if data is valid for LightGBM"""
+    if len(sales_list) < 50:
+        return False, f"Insufficient data: {len(sales_list)} days (need 50+)"
+    return True, "Valid for LightGBM"
+
+
+def can_use_arima(sales_list):
+    """Check if data is valid for ARIMA"""
+    if len(sales_list) < 10:
+        return False, f"Insufficient data: {len(sales_list)} days (need 10+)"
+    return True, "Valid for ARIMA"
+
 
 def analyze_and_recommend_model(sales_list, dates_list):
     """
-    Analyze data and recommend the best model
-    Returns: model_name (string)
+    Analyze data and recommend the best model that can ACTUALLY work
     """
     data_points = len(sales_list)
     
-    # Simple rule-based recommendation
+    # Try models in order of preference, but only if they can actually work
     if data_points >= 50:
-        # Check for seasonality pattern
-        if len(sales_list) >= 14:
-            try:
-                # Quick seasonality check (weekly pattern)
-                weekly_avg = []
-                for i in range(7):
-                    week_values = [sales_list[j] for j in range(i, min(i+7*4, len(sales_list)), 7)]
-                    if week_values:
-                        weekly_avg.append(np.mean(week_values))
-                
-                if len(weekly_avg) == 7 and np.std(weekly_avg) / max(np.mean(weekly_avg), 1) > 0.15:
-                    return "Prophet"
-            except:
-                pass
-        
-        # Check for trend
-        if data_points >= 10:
-            x = np.arange(data_points)
-            slope = np.polyfit(x, sales_list, 1)[0]
-            if abs(slope) / max(np.mean(sales_list), 1) > 0.05:
-                return "Prophet"
-        
-        return "LightGBM"
+        # Check if LightGBM can work
+        lgb_valid, _ = can_use_lightgbm(sales_list)
+        if lgb_valid:
+            return "LightGBM"
     
-    elif data_points >= 30:
-        return "Prophet"
+    if data_points >= 30:
+        # Check if Prophet can work (with valid dates)
+        prophet_valid, _ = can_use_prophet(sales_list, dates_list)
+        if prophet_valid:
+            return "Prophet"
     
-    elif data_points >= 10:
-        return "ARIMA"
+    if data_points >= 10:
+        # Check if ARIMA can work
+        arima_valid, _ = can_use_arima(sales_list)
+        if arima_valid:
+            return "ARIMA"
     
-    else:
-        return "Fallback"
+    # If no model works, use Fallback
+    return "Fallback"
 
 
 def prepare_data_for_model(sales_list, dates_list, model_name):
@@ -82,21 +116,38 @@ def prepare_data_for_model(sales_list, dates_list, model_name):
         }
     
     elif model_name == "Prophet":
-        # Clean dates for Prophet
-        cleaned_dates = []
-        for d in dates_list:
-            if isinstance(d, str):
-                clean_date = d.split('T')[0][:10]
-            elif hasattr(d, 'strftime'):
-                clean_date = d.strftime('%Y-%m-%d')
+        # Clean dates for Prophet (MUST be YYYY-MM-DD, no duplicates, no timezone)
+        cleaned_data = []
+        seen_dates = set()
+        
+        for i, (sale, date_str) in enumerate(zip(sales_list, dates_list)):
+            # Clean date
+            if isinstance(date_str, str):
+                clean_date = date_str.split('T')[0][:10]
+            elif hasattr(date_str, 'strftime'):
+                clean_date = date_str.strftime('%Y-%m-%d')
             else:
-                clean_date = str(d)[:10]
-            cleaned_dates.append(clean_date)
+                clean_date = str(date_str)[:10]
+            
+            # Skip duplicates (keep first)
+            if clean_date not in seen_dates:
+                seen_dates.add(clean_date)
+                cleaned_data.append({
+                    'date': clean_date,
+                    'sales': float(sale) if sale is not None else 0
+                })
+        
+        # Sort by date
+        cleaned_data.sort(key=lambda x: x['date'])
+        
+        final_dates = [d['date'] for d in cleaned_data]
+        final_sales = [d['sales'] for d in cleaned_data]
         
         return {
-            "historical_sales": sales_list,
-            "dates": cleaned_dates,
-            "total_days": len(sales_list),
+            "historical_sales": final_sales,
+            "dates": final_dates,
+            "total_days": len(final_sales),
+            "original_days": len(sales_list),
             "model_ready": True
         }
     
@@ -136,16 +187,13 @@ def prepare_data_for_model(sales_list, dates_list, model_name):
 
 
 # ============================================
-# MAIN ENDPOINT - ANALYZE & RECOMMEND
+# MAIN ENDPOINT
 # ============================================
 
 @app.route('/process-all', methods=['POST'])
 def process_all_data():
     try:
         payload = request.json or {}
-        
-        # Check if user wants analysis (default to True)
-        analyze = payload.get('analyze', True)
         forced_model = payload.get('model', None)
         
         # Fetch data
@@ -161,9 +209,11 @@ def process_all_data():
         
         processed_batch = []
         model_stats = {"ARIMA": 0, "Prophet": 0, "LightGBM": 0, "Fallback": 0}
+        validation_errors = []
         
-        # Track which model was most recommended
-        model_count = {"ARIMA": 0, "Prophet": 0, "LightGBM": 0, "Fallback": 0}
+        print("\n" + "="*60)
+        print("DATA PREPARATION WITH VALIDATION")
+        print("="*60)
         
         for inv in inventories:
             p_id = inv.get('productId')
@@ -197,26 +247,31 @@ def process_all_data():
             sorted_dates = sorted(daily_sales.keys())
             sales_list = [daily_sales[d] for d in sorted_dates]
             
-            # Determine model to use
+            # Determine model to use (with validation)
             if forced_model:
                 selected_model = forced_model
-                model_source = "forced"
-            elif analyze:
-                selected_model = analyze_and_recommend_model(sales_list, sorted_dates)
-                model_source = "recommended"
-                model_count[selected_model] += 1
+                # Validate forced model can actually work
+                if forced_model == "Prophet":
+                    valid, msg = can_use_prophet(sales_list, sorted_dates)
+                    if not valid:
+                        print(f"⚠️ {p_id}: Forced Prophet but {msg} -> Using Fallback")
+                        selected_model = "Fallback"
+                        validation_errors.append({"productId": p_id, "error": msg})
+                elif forced_model == "LightGBM":
+                    valid, msg = can_use_lightgbm(sales_list)
+                    if not valid:
+                        print(f"⚠️ {p_id}: Forced LightGBM but {msg} -> Using Fallback")
+                        selected_model = "Fallback"
+                        validation_errors.append({"productId": p_id, "error": msg})
+                elif forced_model == "ARIMA":
+                    valid, msg = can_use_arima(sales_list)
+                    if not valid:
+                        print(f"⚠️ {p_id}: Forced ARIMA but {msg} -> Using Fallback")
+                        selected_model = "Fallback"
+                        validation_errors.append({"productId": p_id, "error": msg})
             else:
-                # Auto based on data quantity only
-                if len(sales_list) >= 50:
-                    selected_model = "LightGBM"
-                elif len(sales_list) >= 30:
-                    selected_model = "Prophet"
-                elif len(sales_list) >= 10:
-                    selected_model = "ARIMA"
-                else:
-                    selected_model = "Fallback"
-                model_source = "auto"
-                model_count[selected_model] += 1
+                # Auto-select with validation
+                selected_model = analyze_and_recommend_model(sales_list, sorted_dates)
             
             # Prepare data for the selected model
             prepared_data = prepare_data_for_model(sales_list, sorted_dates, selected_model)
@@ -230,7 +285,6 @@ def process_all_data():
                     "current_stock": inv.get('stock', 0),
                     "lead_time_days": inv.get('lead_time_days', 3),
                     "selected_model": selected_model,
-                    "model_source": model_source,
                     "prepared_data": prepared_data,
                     "data_quality": {
                         "total_days": len(sales_list),
@@ -242,97 +296,44 @@ def process_all_data():
                 
                 processed_batch.append(record)
                 model_stats[selected_model] += 1
+                
+                # Print status
+                status_icon = "✅" if selected_model != "Fallback" else "⚠️"
+                print(f"{status_icon} {p_id}: {len(sales_list)} days -> {selected_model}")
         
         # Store in predictions_input
         if processed_batch:
             db.predictions_input.insert_many(processed_batch)
             
-            print("\n" + "="*50)
+            print("\n" + "="*60)
             print("DATA PREPARATION COMPLETE")
-            print("="*50)
+            print("="*60)
             print(f"Total products: {len(processed_batch)}")
-            print(f"Model distribution: {model_stats}")
-            print("="*50)
+            print(f"\nModel Distribution:")
+            for model, count in model_stats.items():
+                if count > 0:
+                    percentage = (count / len(processed_batch)) * 100
+                    print(f"  {model}: {count} products ({percentage:.1f}%)")
+            
+            if validation_errors:
+                print(f"\n⚠️ {len(validation_errors)} products had validation issues")
+            
+            print("="*60)
         
-        # Determine the most recommended model (if not forced)
-        if forced_model:
-            recommended_model = forced_model
-        else:
-            # Find the model with highest count
-            recommended_model = max(model_count, key=model_count.get) if model_count else "Fallback"
+        # Determine the most used model
+        recommended_model = max(model_stats, key=model_stats.get) if model_stats else "Fallback"
         
-        # RETURN THE ACTUAL RECOMMENDED MODEL NAME
         return jsonify({
-            "recommended_model": recommended_model,  # This will be "ARIMA", "Prophet", "LightGBM", or "Fallback"
+            "recommended_model": recommended_model,
             "model_distribution": model_stats,
-            "total_products": len(processed_batch)
+            "total_products": len(processed_batch),
+            "validation_errors": len(validation_errors)
         })
         
     except Exception as e:
         print(f"Error: {str(e)}")
-        return jsonify({"error": str(e)}), 500
-
-
-# ============================================
-# SIMPLE ANALYZE ENDPOINT - JUST RECOMMENDATION
-# ============================================
-
-@app.route('/analyze', methods=['POST'])
-def analyze_only():
-    """
-    Just analyze and return recommended model without preparing data
-    """
-    try:
-        payload = request.json or {}
-        product_id = payload.get('productId')
-        
-        if not product_id:
-            return jsonify({"error": "productId required"}), 400
-        
-        # Fetch data for specific product
-        sales = list(db.sales.find())
-        
-        # Aggregate sales
-        daily_sales = defaultdict(float)
-        for s in sales:
-            for item in s.get('items', []):
-                if item.get('productId') == product_id:
-                    quantity = item.get('quantity', 0)
-                    sale_date = s.get('createdAt')
-                    
-                    if sale_date:
-                        if hasattr(sale_date, 'strftime'):
-                            date_str = sale_date.strftime('%Y-%m-%d')
-                        elif isinstance(sale_date, str):
-                            date_str = sale_date.split('T')[0][:10]
-                        else:
-                            date_str = str(sale_date)[:10]
-                    else:
-                        date_str = datetime.now().strftime('%Y-%m-%d')
-                    
-                    daily_sales[date_str] += quantity
-        
-        if not daily_sales:
-            return jsonify({
-                "productId": product_id,
-                "recommended_model": "Fallback",
-                "reason": "No sales data found"
-            })
-        
-        sorted_dates = sorted(daily_sales.keys())
-        sales_list = [daily_sales[d] for d in sorted_dates]
-        
-        # Get recommendation
-        recommended_model = analyze_and_recommend_model(sales_list, sorted_dates)
-        
-        return jsonify({
-            "productId": product_id,
-            "recommended_model": recommended_model,  # Returns actual model name
-            "data_points": len(sales_list),
-            "avg_daily_sales": round(np.mean(sales_list), 2)
-        })
-        
-    except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 
