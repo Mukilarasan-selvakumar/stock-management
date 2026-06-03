@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Card, Select, Button, Row, Col, Table, Tag, Spin, Empty, message, Tabs, Space, Typography } from "antd";
 import { RocketOutlined, ExperimentOutlined, TableOutlined, AreaChartOutlined, ReloadOutlined } from "@ant-design/icons";
 import { ResponsiveContainer, BarChart, Bar, PieChart, Pie, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import axiosInstance from "../api/axiosInstance";
 import Navbar from "./navbar";
+import { AuthContext } from "../context/AuthContext";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
 const { Title, Text } = Typography;
 
 const Analytics = () => {
+    const { user } = useContext(AuthContext);
+
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState([]);
   const [topCustomers, setTopCustomers] = useState([]);
@@ -113,8 +116,7 @@ const Analytics = () => {
   return (
     <>
       <Navbar>
-
-      <div style={{ padding: 30 }}>
+{(user?.role === "admin" || user?.role === "superadmin") && <div style={{ padding: 30 }}>
         {/* HEADER */}
         <Card style={{ marginBottom: 20 }}>
           <Row justify="space-between" align="middle">
@@ -214,7 +216,8 @@ const Analytics = () => {
             </TabPane>
           </Tabs>
         )}
-      </div>
+      </div> }
+      
             </Navbar>
 
     </>

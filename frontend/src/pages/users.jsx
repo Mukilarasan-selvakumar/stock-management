@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 import { Table, Button, Modal, Form, Input, Select } from "antd";
 import {
@@ -8,8 +8,11 @@ import {
 } from "@ant-design/icons";
 import Swal from "sweetalert2";
 import Navbar from "./navbar";
+import { AuthContext } from "../context/AuthContext";
 
 const Users = () => {
+      const { user } = useContext(AuthContext);
+  
   const [users, setUsers] = useState([]);
   const [open, setOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
@@ -184,7 +187,7 @@ const Users = () => {
 
   return (
     <Navbar>
-      <div
+      { user?.role === "superadmin" && <div
         style={{
           background: "#f8fafc",
           minHeight: "100vh",
@@ -324,7 +327,8 @@ const Users = () => {
             </Form>
           </Modal>
         </div>
-      </div>
+      </div>}
+      
     </Navbar>
   );
 };

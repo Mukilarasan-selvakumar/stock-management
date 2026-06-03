@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 import { Table, Button, Modal, Form, Input } from "antd";
 import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import Navbar from "./navbar";
+import { AuthContext } from "../context/AuthContext";
 
 const StockPage = () => {
+      const { user } = useContext(AuthContext);
+
   const [data, setData] = useState([]);
   const [open, setOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
@@ -79,7 +82,7 @@ const columns = [
   return (
     <>
       <Navbar >
-      <div style={{ padding: 40, background: "#f8fafc", minHeight: "calc(100vh - 70px)" }}>
+        {(user?.role === "admin" || user?.role === "superadmin") &&  <div style={{ padding: 40, background: "#f8fafc", minHeight: "calc(100vh - 70px)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 25 }}>
           <h2 style={{ margin: 0, fontWeight: 700, color: "#1e293b" }}>Inventory Management</h2>
           <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd} size="medium" style={{ borderRadius: 10 }}>
@@ -138,7 +141,8 @@ const columns = [
   </Form.Item>
 </Form>
         </Modal>
-      </div>
+      </div>}
+     
             </Navbar>
 
     </>

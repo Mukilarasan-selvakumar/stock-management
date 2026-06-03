@@ -34,12 +34,19 @@ const protect = async (req, res, next) => {
 };
 
 
-const isAdmin = (req, res, next) => {
+const isSuperAdmin = (req, res, next) => {
   if (req.user && req.user.role === "superadmin") {
     next();
   } else {
     res.status(403).json({ message: "Access denied (Admin only)" });
   }
 };
+const isAdmin = (req, res, next) => {
+  if (req.user &&( req.user.role === "admin" || req.user.role === "superadmin")) {
+    next();
+  } else {
+    res.status(403).json({ message: "Access denied (Admin only)" });
+  }
+};
 
-module.exports = { protect, isAdmin };
+module.exports = { protect, isAdmin ,isSuperAdmin};

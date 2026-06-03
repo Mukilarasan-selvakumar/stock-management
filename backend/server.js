@@ -9,6 +9,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require("./routes/userRoutes");
 const inventoryRoutes = require("./routes/inventoryRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
+const { isAdmin, isSuperAdmin, protect } = require('./middleware/authMiddleware');
 require("./utils/scheduler");
 
 dotenv.config();
@@ -60,9 +61,9 @@ app.use(cookieParser());
 
 
 app.use('/api/auth', authRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/inventory", inventoryRoutes);
-app.use("/api/analytics", analyticsRoutes);
+app.use("/api/users", protect, isSuperAdmin, userRoutes);
+app.use("/api/inventory", protect, isAdmin, inventoryRoutes);
+app.use("/api/analytics", protect, isAdmin, analyticsRoutes);
 
 const PORT = process.env.PORT || 5000;
 
