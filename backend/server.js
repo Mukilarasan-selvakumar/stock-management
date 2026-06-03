@@ -68,5 +68,5 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log("🗓️  2-Week Background Prediction Scheduler Active");
+  console.log(" 2-Week Background Prediction Scheduler Active");
 });

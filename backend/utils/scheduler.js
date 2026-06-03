@@ -76,13 +76,13 @@ const sendPredictionReport = async () => {
     await transporter.sendMail({
       from: `"AI Stock System" <${process.env.EMAIL_USER}>`,
       to: recipientEmails,
-      subject: "📊 Inventory Analytics Dashboard",
+      subject: " Inventory Analytics Dashboard",
       html: htmlContent,
     });
 
-    console.log("✅ Email sent successfully");
+    console.log(" Email sent successfully");
   } catch (err) {
-    console.error("❌ Email Error:", err.message);
+    console.error("Email Error:", err.message);
   }
 };
 
