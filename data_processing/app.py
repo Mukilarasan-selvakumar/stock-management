@@ -58,23 +58,21 @@ def can_use_prophet(sales_list, dates_list):
 
 
 def can_use_lightgbm(sales_list):
-    """Check if data is valid for LightGBM"""
+
     if len(sales_list) < 50:
         return False, f"Insufficient data: {len(sales_list)} days (need 50+)"
     return True, "Valid for LightGBM"
 
 
 def can_use_arima(sales_list):
-    """Check if data is valid for ARIMA"""
+
     if len(sales_list) < 10:
         return False, f"Insufficient data: {len(sales_list)} days (need 10+)"
     return True, "Valid for ARIMA"
 
 
 def analyze_and_recommend_model(sales_list, dates_list):
-    """
-    Analyze data and recommend the best model that can ACTUALLY work
-    """
+
     data_points = len(sales_list)
     
     
@@ -231,7 +229,7 @@ def process_all_data():
             if not daily_sales:
                 continue
                 
-            # Sort by date
+
             sorted_dates = sorted(daily_sales.keys())
             sales_list = [daily_sales[d] for d in sorted_dates]
             
