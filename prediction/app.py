@@ -350,7 +350,7 @@ def predict_all():
                 bar = "|" * int(percentage / 2)
                 print(f"{model:<15} : {count:>3} products ({percentage:>5.1f}%) {bar}")
         
-        # Warning if models are failing
+
         prophet_planned = sum(1 for r in input_data if r.get('selected_model') == 'Prophet')
         prophet_actual = model_usage_stats['Prophet']
         if prophet_planned > prophet_actual:
