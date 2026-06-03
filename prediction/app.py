@@ -10,7 +10,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 load_dotenv()
 
-# ML Models
+
 from prophet import Prophet
 import lightgbm as lgb
 from statsmodels.tsa.arima.model import ARIMA
@@ -22,9 +22,7 @@ MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 client = MongoClient(MONGO_URI)
 db = client["test"]
 
-# ============================================
-# MODEL FUNCTIONS
-# ============================================
+#model funtions
 
 def run_arima(prepared_data, days):
     """ARIMA using prepared data"""
@@ -174,9 +172,7 @@ def calculate_backtesting_accuracy(sales_data, model_func, prepared_data, test_d
         return None
 
 
-# ============================================
-# MAIN PREDICTION ROUTE WITH ACCURACY
-# ============================================
+
 
 @app.route('/predict-all', methods=['POST'])
 def predict_all():
@@ -286,9 +282,7 @@ def predict_all():
             db.predictions_output.delete_many({})
             db.predictions_output.insert_many(results)
 
-        # ============================================
-        # CALCULATE OVERALL ACCURACY METRICS
-        # ============================================
+
         
         overall_metrics = {}
         if all_accuracy_scores:
@@ -313,12 +307,10 @@ def predict_all():
         
         accuracy_rating = "Excellent" if overall_metrics.get('avg_accuracy', 0) >= 80 else "Good" if overall_metrics.get('avg_accuracy', 0) >= 60 else "Poor" if overall_metrics.get('avg_accuracy', 0) >= 40 else "Very Poor"
         
-        # ============================================
-        # PRINT COMPLETE TABLE
-        # ============================================
+
         
         print("\n" + "="*70)
-        print("📊 OVERALL ACCURACY METRICS")
+        print("OVERALL ACCURACY METRICS")
         print("="*70)
         
         models_used_str = ', '.join([m for m, c in model_usage_stats.items() if c > 0])
@@ -332,10 +324,10 @@ def predict_all():
             print(f"{'R² Score':<30} : {overall_metrics['avg_r2']} (Closer to 1 is better)")
             print(f"{'Tested Products':<30} : {overall_metrics['total_tested']}")
         else:
-            print(f"{'Accuracy':<30} : ⚠️ No accuracy metrics available (insufficient data for backtesting)")
+            print(f"{'Accuracy':<30} : No accuracy metrics available (insufficient data for backtesting)")
         
         print("\n" + "-"*70)
-        print("📊 MODEL-WISE ACCURACY BREAKDOWN")
+        print("MODEL-WISE ACCURACY BREAKDOWN")
         print("-"*70)
         print(f"{'Model':<15} {'Accuracy':<12} {'Samples':<10} {'Rating':<10}")
         print("-"*50)
@@ -344,28 +336,28 @@ def predict_all():
             if model in per_model_accuracy:
                 acc = per_model_accuracy[model]['accuracy']
                 samples = per_model_accuracy[model]['samples']
-                rating = "⭐" if acc >= 80 else "✓" if acc >= 60 else "⚠️" if acc >= 40 else "❌"
+                rating = "*" if acc >= 80 else "✓" if acc >= 60 else "⚠️" if acc >= 40 else "x"
                 print(f"{model:<15} {acc:.2f}%{' ':<6} {samples:<10} {rating}")
             elif model_usage_stats.get(model, 0) > 0:
-                print(f"{model:<15} {'N/A':<12} {0:<10} ⚠️")
+                print(f"{model:<15} {'N/A':<12} {0:<10} ")
         
         print("\n" + "-"*70)
-        print("📦 MODEL USAGE DISTRIBUTION")
+        print("MODEL USAGE DISTRIBUTION")
         print("-"*70)
         for model, count in model_usage_stats.items():
             if count > 0:
                 percentage = (count / len(results)) * 100
-                bar = "█" * int(percentage / 2)
+                bar = "|" * int(percentage / 2)
                 print(f"{model:<15} : {count:>3} products ({percentage:>5.1f}%) {bar}")
         
         # Warning if models are failing
         prophet_planned = sum(1 for r in input_data if r.get('selected_model') == 'Prophet')
         prophet_actual = model_usage_stats['Prophet']
         if prophet_planned > prophet_actual:
-            print(f"\n⚠️ WARNING: Prophet was planned for {prophet_planned} products but only succeeded for {prophet_actual}")
+            print(f"\n WARNING: Prophet was planned for {prophet_planned} products but only succeeded for {prophet_actual}")
         
         print("="*70)
-        print("✅ PREDICTION COMPLETED")
+        print(" PREDICTION COMPLETED")
         print("="*70)
 
         return jsonify({
@@ -384,9 +376,7 @@ def predict_all():
         return jsonify({"error": str(e)}), 500
 
 
-# ============================================
-# ENDPOINTS
-# ============================================
+
 
 @app.route('/predictions/<model_name>', methods=['GET'])
 def get_predictions_by_model(model_name):
