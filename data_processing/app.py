@@ -22,9 +22,7 @@ else:
 client = MongoClient(MONGO_URI if MONGO_URI else "mongodb://localhost:27017")
 db = client["test"]
 
-# ============================================
-# VALIDATION FUNCTIONS
-# ============================================
+
 
 def can_use_prophet(sales_list, dates_list):
     """Check if data is actually valid for Prophet"""
@@ -93,7 +91,7 @@ def analyze_and_recommend_model(sales_list, dates_list):
             return "Prophet"
     
     if data_points >= 10:
-        # Check if ARIMA can work
+        
         arima_valid, _ = can_use_arima(sales_list)
         if arima_valid:
             return "ARIMA"
@@ -102,9 +100,7 @@ def analyze_and_recommend_model(sales_list, dates_list):
 
 
 def prepare_data_for_model(sales_list, dates_list, model_name):
-    """
-    Prepare data for the recommended model
-    """
+
     if model_name == "ARIMA":
         return {
             "historical_sales": sales_list,
@@ -117,7 +113,7 @@ def prepare_data_for_model(sales_list, dates_list, model_name):
         seen_dates = set()
         
         for i, (sale, date_str) in enumerate(zip(sales_list, dates_list)):
-            # Clean date
+   
             if isinstance(date_str, str):
                 clean_date = date_str.split('T')[0][:10]
             elif hasattr(date_str, 'strftime'):
@@ -180,9 +176,7 @@ def prepare_data_for_model(sales_list, dates_list, model_name):
         }
 
 
-# ============================================
-# MAIN ENDPOINT
-# ============================================
+
 
 @app.route('/process-all', methods=['POST'])
 def process_all_data():
@@ -291,11 +285,11 @@ def process_all_data():
                 processed_batch.append(record)
                 model_stats[selected_model] += 1
                 
-                # Print status
-                status_icon = "✅" if selected_model != "Fallback" else "⚠️"
+
+                status_icon = "Success" if selected_model != "Fallback" else "Fallback"
                 print(f"{status_icon} {p_id}: {len(sales_list)} days -> {selected_model}")
         
-        # Store in predictions_input
+
         if processed_batch:
             db.predictions_input.insert_many(processed_batch)
             
