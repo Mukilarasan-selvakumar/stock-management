@@ -8,6 +8,7 @@ import debounce from "lodash/debounce";
 const Billing = () => {
   const [items, setItems] = useState([]);
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false); // ✅ Loader state
 
   // ➕ Add item
   const addItem = () => {
@@ -79,6 +80,8 @@ const Billing = () => {
         return message.error("Add at least one product");
       }
 
+      setLoading(true); // ✅ Start loader
+
       await axiosInstance.post("/billing/sales", {
         ...values,
         items,
@@ -93,6 +96,8 @@ const Billing = () => {
         err?.response?.data?.message ||
           "Error creating bill"
       );
+    } finally {
+      setLoading(false); // ✅ Stop loader (success or error)
     }
   };
 
@@ -155,109 +160,110 @@ const Billing = () => {
 
   return (
     <>
-      <Navbar >
-
-      <div
-        style={{
-          padding: 40,
-          background: "#f8fafc",
-          minHeight: "calc(100vh - 70px)",
-        }}
-      >
-        <div style={{ maxWidth: 1000, margin: "auto" }}>
-          <div style={{ marginBottom: 25 }}>
-            <h2>Billing & Invoicing</h2>
-            <p>Create a new sales transaction</p>
-          </div>
-
-          <div
-            style={{
-              background: "#fff",
-              padding: 30,
-              borderRadius: 16,
-            }}
-          >
-            {/* CUSTOMER FORM */}
-            <Form form={form} layout="vertical">
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns:
-                    "1fr 1fr 1fr",
-                  gap: "20px",
-                }}
-              >
-                <Form.Item
-                  name="customerName"
-                  label="Customer Name"
-                  rules={[{ required: true }]}
-                >
-                  <Input placeholder="Enter name" />
-                </Form.Item>
-
-                <Form.Item
-                  name="phone"
-                  label="Phone"
-                >
-                  <Input placeholder="Enter phone" />
-                </Form.Item>
-
-                <Form.Item
-                  name="email"
-                  label="Email"
-                >
-                  <Input placeholder="Enter email" />
-                </Form.Item>
-              </div>
-            </Form>
+      <Navbar>
+        <div
+          style={{
+            padding: 40,
+            background: "#f8fafc",
+            minHeight: "calc(100vh - 70px)",
+          }}
+        >
+          <div style={{ maxWidth: 1000, margin: "auto" }}>
+            <div style={{ marginBottom: 25 }}>
+              <h2>Billing & Invoicing</h2>
+              <p>Create a new sales transaction</p>
+            </div>
 
             <div
               style={{
-                margin: "20px 0",
-                borderTop: "1px solid #eee",
-              }}
-            />
-
-            {/* ITEMS */}
-            <Space style={{ marginBottom: 10 }}>
-              <Button
-                type="dashed"
-                icon={<PlusOutlined />}
-                onClick={addItem}
-              >
-                Add Product
-              </Button>
-            </Space>
-
-            <Table
-              dataSource={items}
-              columns={columns}
-              pagination={false}
-              rowKey={(r, i) => i}
-            />
-
-            {/* TOTAL */}
-            <div
-              style={{
-                marginTop: 20,
-                display: "flex",
-                justifyContent: "space-between",
+                background: "#fff",
+                padding: 30,
+                borderRadius: 16,
               }}
             >
-              <h3>Total: ₹ {totalAmount}</h3>
+              {/* CUSTOMER FORM */}
+              <Form form={form} layout="vertical">
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      "1fr 1fr 1fr",
+                    gap: "20px",
+                  }}
+                >
+                  <Form.Item
+                    name="customerName"
+                    label="Customer Name"
+                    rules={[{ required: true }]}
+                  >
+                    <Input placeholder="Enter name" />
+                  </Form.Item>
 
-              <Button
-                type="primary"
-                onClick={handleSubmit}
+                  <Form.Item
+                    name="phone"
+                    label="Phone"
+                  >
+                    <Input placeholder="Enter phone" />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="email"
+                    label="Email"
+                  >
+                    <Input placeholder="Enter email" />
+                  </Form.Item>
+                </div>
+              </Form>
+
+              <div
+                style={{
+                  margin: "20px 0",
+                  borderTop: "1px solid #eee",
+                }}
+              />
+
+              {/* ITEMS */}
+              <Space style={{ marginBottom: 10 }}>
+                <Button
+                  type="dashed"
+                  icon={<PlusOutlined />}
+                  onClick={addItem}
+                  disabled={loading} // ✅ Disable while loading
+                >
+                  Add Product
+                </Button>
+              </Space>
+
+              <Table
+                dataSource={items}
+                columns={columns}
+                pagination={false}
+                rowKey={(r, i) => i}
+              />
+
+              {/* TOTAL */}
+              <div
+                style={{
+                  marginTop: 20,
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
               >
-                Submit
-              </Button>
+                <h3>Total: ₹ {totalAmount}</h3>
+
+                <Button
+                  type="primary"
+                  onClick={handleSubmit}
+                  loading={loading} // ✅ Show loader on button
+                  disabled={loading} // ✅ Disable while loading
+                >
+                  Submit
+                </Button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-            </Navbar>
-
+      </Navbar>
     </>
   );
 };

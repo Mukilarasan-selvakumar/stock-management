@@ -9,9 +9,12 @@ import {
 import Swal from "sweetalert2";
 import Navbar from "./navbar";
 import { AuthContext } from "../context/AuthContext";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+import "./Users.css"; // We'll create this CSS file
 
 const Users = () => {
-      const { user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   
   const [users, setUsers] = useState([]);
   const [open, setOpen] = useState(false);
@@ -42,7 +45,10 @@ const Users = () => {
   // EDIT USER
   const handleEdit = (record) => {
     setEditUser(record);
-    form.setFieldsValue(record);
+    form.setFieldsValue({
+      ...record,
+      phone: record.phone || "",
+    });
     setOpen(true);
   };
 
@@ -145,6 +151,7 @@ const Users = () => {
     {
       title: "Phone",
       dataIndex: "phone",
+      render: (phone) => phone || "-",
     },
     {
       title: "Role",
@@ -187,148 +194,176 @@ const Users = () => {
 
   return (
     <Navbar>
-      { user?.role === "superadmin" && <div
-        style={{
-          background: "#f8fafc",
-          minHeight: "100vh",
-        }}
-      >
-        <div style={{ padding: 40 }}>
-          {/* HEADER */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 25,
-            }}
-          >
-            <h2
+      {user?.role === "superadmin" && (
+        <div
+          style={{
+            background: "#f8fafc",
+            minHeight: "100vh",
+          }}
+        >
+          <div style={{ padding: 40 }}>
+            {/* HEADER */}
+            <div
               style={{
-                margin: 0,
-                fontWeight: 700,
-                color: "#1e293b",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 25,
               }}
             >
-              User & Role Management
-            </h2>
+              <h2
+                style={{
+                  margin: 0,
+                  fontWeight: 700,
+                  color: "#1e293b",
+                }}
+              >
+                User & Role Management
+              </h2>
 
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAdd}
-              style={{ borderRadius: 10 }}
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleAdd}
+                style={{ borderRadius: 10 }}
+              >
+                Add New User
+              </Button>
+            </div>
+
+            {/* TABLE */}
+            <Table
+              dataSource={users}
+              columns={columns}
+              rowKey="_id"
+              style={{
+                background: "#fff",
+                borderRadius: 12,
+                overflow: "hidden",
+                boxShadow:
+                  "0 4px 6px -1px rgba(0,0,0,0.1)",
+              }}
+            />
+
+            {/* MODAL */}
+            <Modal
+              title={editUser ? "Edit User" : "Add User"}
+              open={open}
+              onOk={handleSubmit}
+              onCancel={() => setOpen(false)}
+              okText={editUser ? "Update" : "Create"}
+              width={600}
             >
-              Add New User
-            </Button>
-          </div>
-
-          {/* TABLE */}
-          <Table
-            dataSource={users}
-            columns={columns}
-            rowKey="_id"
-            style={{
-              background: "#fff",
-              borderRadius: 12,
-              overflow: "hidden",
-              boxShadow:
-                "0 4px 6px -1px rgba(0,0,0,0.1)",
-            }}
-          />
-
-          {/* MODAL */}
-          <Modal
-            title={editUser ? "Edit User" : "Add User"}
-            open={open}
-            onOk={handleSubmit}
-            onCancel={() => setOpen(false)}
-            okText={editUser ? "Update" : "Create"}
-          >
-            <Form form={form} layout="vertical">
-              <Form.Item
-                name="name"
-                label="Name"
-                rules={[
-                  {
-                    required: true,
-                    message: "Name is required",
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-
-              <Form.Item
-                name="email"
-                label="Email"
-                rules={[
-                  {
-                    required: true,
-                    message: "Email is required",
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-
-              <Form.Item
-                name="phone"
-                label="Phone"
-                rules={[
-                  {
-                    required: true,
-                    message: "Phone is required",
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-
-              {!editUser && (
+              <Form form={form} layout="vertical">
                 <Form.Item
-                  name="password"
-                  label="Password"
+                  name="name"
+                  label="Name"
                   rules={[
                     {
                       required: true,
-                      message: "Password is required",
-                    },
-                    {
-                      min: 6,
-                      message:
-                        "Password must be at least 6 characters",
+                      message: "Name is required",
                     },
                   ]}
                 >
-                  <Input.Password />
+                  <Input />
                 </Form.Item>
-              )}
 
-              <Form.Item
-                name="role"
-                label="Role"
-                initialValue="user"
-              >
-                <Select>
-                  <Select.Option value="user">
-                    User
-                  </Select.Option>
+                <Form.Item
+                  name="email"
+                  label="Email"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Email is required",
+                    },
+                    {
+                      type: "email",
+                      message: "Please enter a valid email",
+                    },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
 
-                  <Select.Option value="admin">
-                    Admin
-                  </Select.Option>
+                <Form.Item
+                  name="phone"
+                  label="Phone"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Phone is required",
+                    },
+                    {
+                      validator: (_, value) => {
+                        if (!value) {
+                          return Promise.reject(
+                            new Error("Phone number is required")
+                          );
+                        }
 
-                  <Select.Option value="superadmin">
-                    Super Admin
-                  </Select.Option>
-                </Select>
-              </Form.Item>
-            </Form>
-          </Modal>
+                        if (!isValidPhoneNumber(value)) {
+                          return Promise.reject(
+                            new Error("Please enter a valid phone number")
+                          );
+                        }
+
+                        return Promise.resolve();
+                      },
+                    },
+                  ]}
+                >
+                  <PhoneInput
+                    international
+                    defaultCountry="IN"
+                    countryCallingCodeEditable={false}
+                    placeholder="Enter phone number"
+                  />
+                </Form.Item>
+
+                {!editUser && (
+                  <Form.Item
+                    name="password"
+                    label="Password"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Password is required",
+                      },
+                      {
+                        min: 6,
+                        message:
+                          "Password must be at least 6 characters",
+                      },
+                    ]}
+                  >
+                    <Input.Password />
+                  </Form.Item>
+                )}
+
+                <Form.Item
+                  name="role"
+                  label="Role"
+                  initialValue="user"
+                >
+                  <Select>
+                    <Select.Option value="user">
+                      User
+                    </Select.Option>
+
+                    <Select.Option value="admin">
+                      Admin
+                    </Select.Option>
+
+                    <Select.Option value="superadmin">
+                      Super Admin
+                    </Select.Option>
+                  </Select>
+                </Form.Item>
+              </Form>
+            </Modal>
+          </div>
         </div>
-      </div>}
-      
+      )}
     </Navbar>
   );
 };

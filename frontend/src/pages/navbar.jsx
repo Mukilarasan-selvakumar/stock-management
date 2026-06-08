@@ -8,6 +8,7 @@ import {
   FiBarChart2,
   FiUsers,
   FiLogOut,
+  FiUser
 } from "react-icons/fi";
 import "./navbar.css";
 
@@ -29,15 +30,15 @@ const Navbar = ({ children }) => {
         </div>
 
         <nav className="menu">
-          <NavLink
-            to="/"
+          {(user?.role === "admin" || user?.role === "superadmin")&&<NavLink
+            to="/dashboard"
             className={({ isActive }) =>
               isActive ? "menu-item active" : "menu-item"
             }
           >
             <FiHome />
-            <span  style={{fontSize:"14px"}}>Dashboard</span>
-          </NavLink>
+            <span style={{fontSize:"14px"}}>Dashboard</span>
+          </NavLink>}
 
           <NavLink
             to="/billing"
@@ -84,6 +85,15 @@ const Navbar = ({ children }) => {
               <span  style={{fontSize:"14px"}}>Users</span>
             </NavLink>
           )}
+          <NavLink
+            to="/account"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+          >
+            <FiUser/>
+            <span  style={{fontSize:"14px"}}>Account</span>
+          </NavLink>
         </nav>
       </aside>
 

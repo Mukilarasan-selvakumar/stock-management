@@ -4,11 +4,13 @@ import { ConfigProvider } from 'antd';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import Dashboard from './pages/Dashboard';
 import Users from './pages/users';
 import StockPage from './pages/StockPage';
 import Billing from './pages/Billing';
 import Analytics from './pages/Analytics';
+import Account from './pages/Account';
+import AdminDashboard from './pages/AdminDashboard'
+import Dashboard from './pages/Dashboard';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useContext(AuthContext);
@@ -50,11 +52,29 @@ function AppRoutes() {
       />
 
       {/* PROTECTED */}
+
+
+     <Route
+  path="/"
+  element={
+    <ProtectedRoute>
+      < Dashboard/>
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/dashboard"
+  element={
+    <ProtectedRoute>
+      < AdminDashboard/>
+    </ProtectedRoute>
+  }
+/>
       <Route
-        path="/"
+        path="/account"
         element={
           <ProtectedRoute>
-            <Dashboard />
+            <Account />
           </ProtectedRoute>
         }
       />

@@ -13,7 +13,6 @@ const saleSchema = new mongoose.Schema(
       {
         productId: String,
         name: String,
-        productName:String,
         price: Number,
         quantity: Number,
         total: Number,

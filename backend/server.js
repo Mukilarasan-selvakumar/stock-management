@@ -9,6 +9,8 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require("./routes/userRoutes");
 const inventoryRoutes = require("./routes/inventoryRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
+const saleRoutes = require("./routes/saleRoutes");
+
 const { isAdmin, isSuperAdmin, protect } = require('./middleware/authMiddleware');
 require("./utils/scheduler");
 
@@ -64,6 +66,8 @@ app.use('/api/auth', authRoutes);
 app.use("/api/users", protect, isSuperAdmin, userRoutes);
 app.use("/api/inventory", protect, isAdmin, inventoryRoutes);
 app.use("/api/analytics", protect, isAdmin, analyticsRoutes);
+app.use("/api/sales", protect, isAdmin, saleRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 

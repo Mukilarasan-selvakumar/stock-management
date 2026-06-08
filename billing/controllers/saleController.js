@@ -5,6 +5,7 @@ const path = require("path");
 
 const Sale = require("../models/Sale");
 const Inventory = require("../models/Inventory");
+const StockMovement = require("../models/StockMovement");
 
 
 
@@ -241,50 +242,76 @@ exports.createSale = async (req, res) => {
     }
 
     let totalAmount = 0;
-
     const updatedItems = [];
+    const stockMovements = []; // Track stock movements for logging
 
     for (const item of items) {
-      const updated =
-        await Inventory.findOneAndUpdate(
-          {
-            productId: item.productId,
-            stock: {
-              $gte: item.quantity,
-            },
-          },
-          {
-            $inc: {
-              stock: -item.quantity,
-            },
-          },
-          {
-            returnDocument: "after",
-          }
-        );
-
-      if (!updated) {
+      // Get current stock before update
+      const currentInventory = await Inventory.findOne({ 
+        productId: item.productId 
+      });
+      
+      if (!currentInventory) {
         return res.status(400).json({
-          message: `Not enough stock for ${item.productId}`,
+          message: `Product ${item.productId} not found in inventory`,
         });
       }
 
-      const itemTotal =
-        item.price * item.quantity;
+      const previousStock = currentInventory.stock;
+
+      // Update inventory with stock reduction
+      const updated = await Inventory.findOneAndUpdate(
+        {
+          productId: item.productId,
+          stock: {
+            $gte: item.quantity,
+          },
+        },
+        {
+          $inc: {
+            stock: -item.quantity,
+          },
+          $set: {
+            lastUpdated: Date.now(),
+            updatedAt: Date.now()
+          }
+        },
+        {
+          returnDocument: "after",
+        }
+      );
+
+      if (!updated) {
+        return res.status(400).json({
+          message: `Not enough stock for ${item.productId}. Available: ${currentInventory?.stock || 0}`,
+        });
+      }
+
+      const itemTotal = item.price * item.quantity;
 
       updatedItems.push({
         productId: item.productId,
-        productName:
-          item.productName ||
-          item.productId,
+        productName: item.name ,
         quantity: item.quantity,
         price: item.price,
         total: itemTotal,
       });
 
       totalAmount += itemTotal;
+
+      // Store stock movement data for logging
+      stockMovements.push({
+        productId: item.productId,
+        productName: item.productName || item.productId,
+        previousStock: previousStock,
+        newStock: updated.stock,
+        change: -item.quantity,
+        quantity: item.quantity,
+        price: item.price
+      });
     }
 
+    // Create sale record
     const sale = await Sale.create({
       customerName,
       phone,
@@ -293,23 +320,66 @@ exports.createSale = async (req, res) => {
       totalAmount,
     });
 
-    if (
-      sale.email &&
-      sale.email.trim() !== ""
-    ) {
+    // Log all stock movements
+    for (const movement of stockMovements) {
+      await logStockMovement(
+        movement.productId,
+        movement.productName,
+        movement.previousStock,
+        movement.newStock,
+        'SALE',
+        `Sale of ${movement.quantity} units - Customer: ${customerName || 'Guest'}, Total: $${movement.price * movement.quantity}`,
+        sale._id,
+        'sale',
+        req.user?.email || customerName || 'system',
+        {
+          saleId: sale._id,
+          customerName: customerName || 'Guest',
+          customerEmail: email,
+          customerPhone: phone,
+          quantity: movement.quantity,
+          unitPrice: movement.price,
+          totalAmount: movement.price * movement.quantity,
+          saleDate: new Date()
+        }
+      );
+    }
+
+    // Send invoice email if email exists
+    if (sale.email && sale.email.trim() !== "") {
       await sendInvoiceMail(sale);
     }
 
     res.status(201).json({
-      message:
-        "Sale created and invoice emailed successfully",
+      message: "Sale created and stock updated successfully",
       sale,
+      stockMovements: stockMovements
     });
   } catch (error) {
     console.error(error);
-
     res.status(500).json({
       message: error.message,
     });
+  }
+};
+
+const logStockMovement = async (productId, productName, previousStock, newStock, type, reason, referenceId = null, referenceType = null, performedBy = 'system', metadata = {}) => {
+  try {
+    const change = newStock - previousStock;
+    await StockMovement.create({
+      productId,
+      productName,
+      previousStock,
+      newStock,
+      change,
+      type,
+      reason,
+      referenceId,
+      referenceType,
+      performedBy,
+      metadata
+    });
+  } catch (err) {
+    console.error("Error logging stock movement:", err);
   }
 };

@@ -1,0 +1,31 @@
+.PhoneInput {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 50px;
+  border: 1px solid #d9d9d9;
+  border-radius: 12px;
+  padding: 0 12px;
+  background: #fff;
+}
+
+.PhoneInput:focus-within {
+  border-color: #4096ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.PhoneInputCountry {
+  margin-right: 10px;
+}
+
+.PhoneInputInput {
+  flex: 1;
+  border: none !important;
+  outline: none !important;
+  font-size: 16px;
+  background: transparent;
+}
+
+.PhoneInputInput::placeholder {
+  color: #bfbfbf;
+}

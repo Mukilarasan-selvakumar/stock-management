@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
         try {
           const res = await axiosInstance.get('/auth/me');
           setUser(res.data);
+          console.log({res})
         } catch (error) {
           console.error("Auth check failed:", error);
           sessionStorage.removeItem('accessToken');
@@ -39,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     const res = await axiosInstance.post('/auth/login', { email, password });
     sessionStorage.setItem('accessToken', res.data.accessToken);
-    setUser(res.data.user);
+    // setUser(res.data.user);
     navigate('/');
   };
 
